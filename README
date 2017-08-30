@@ -11,10 +11,12 @@ This program allows for automated motion detection of GWMA on their lekking logs
 The vision analysis is built using OpenCV for Python.
 
 Program process:
-	1. Read-in a single video file and determine a stationary "background" from the FIRST VIDEO FRAME.
+	1. Read-in a single video file and determine a stationary "background"
+	   from the FIRST VIDEO FRAME.
 	2. Resize input, convert to grayscale, and blur.
 	3. Determine pixel differences from background frame and determine which frames have motion.
-	4. Calculate motion periods, including a buffer to avoid false positive starts and false negative stops.
+	4. Calculate motion periods, including a buffer to avoid false positive starts
+           and false negative stops.
 	5. Output video clips (currently as .AVI) as detection finishes.
 		Output filenames are formatted as: INPUTFILENAME_STARTSEC_ENDSEC
 	6. Output relevant motion period data.
