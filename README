@@ -1,0 +1,46 @@
+# ----------------------------------
+#
+#	Golden-Winged Manakin vision analysis
+#	Working draft 08/30/17 
+#	LU TAYLOR
+#	README
+#
+# ----------------------------------
+
+This program allows for automated motion detection of GWMA on their lekking logs.
+The vision analysis is built using OpenCV for Python.
+
+Program process:
+	1. Read-in a single video file and determine a stationary "background" from the FIRST VIDEO FRAME.
+	2. Resize input, convert to grayscale, and blur.
+	3. Determine pixel differences from background frame and determine which frames have motion.
+	4. Calculate motion periods, including a buffer to avoid false positive starts and false negative stops.
+	5. Output video clips (currently as .AVI) as detection finishes.
+		Output filenames are formatted as: INPUTFILENAME_STARTSEC_ENDSEC
+	6. Output relevant motion period data.
+
+Running the program:
+	This program was built on Ubuntu 14.04 in Python 2.7.6 using OpenCV 2.4.
+	Other versions may interfere with video I/O due to Codec problems.
+	OpenCV is terrible with version differences, so watch out.
+	
+	1. In OSX or Ubuntu, open a terminal window.
+	2. Navigate (cd) to the directory that contains the src/ folder.
+	3. Compile and run the program with the commands:
+		python src/motionDetection.py [-h][-w] inFile [-o{outFile}]
+		
+		[inFile] is required, and must be the file path to the input video
+
+		[-o] is optional. If -o is included, you must include a DIRECTORY FOLDER for output.
+		[-w] is optional. It shows the thresholded motion images as the program runs. Pretty neat.
+		[-h] is optional, and displays parameter help without running the program.
+
+	EXAMPLES:
+	     A full test:
+		python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4 -o Test_Output/
+
+	     Without image display:
+	 	python src/motionDetection.py Test_Footage/Male_Female_Brits.mp4 -o Test_Output/
+
+	     With image display but without output:
+	 	python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4
