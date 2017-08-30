@@ -31,16 +31,18 @@ Running the program:
 		
 		[inFile] is required, and must be the file path to the input video
 
-		[-o] is optional. If -o is included, you must include a DIRECTORY FOLDER for output.
-		[-w] is optional. It shows the thresholded motion images as the program runs. Pretty neat.
+		[-o] is optional. If -o is included, you MUST include a DIRECTORY for output.
+		[-w] is optional. Show the thresholded motion images as the program runs. Fun.
 		[-h] is optional, and displays parameter help without running the program.
 
 	EXAMPLES:
+	     Make an Output/ folder, then in the terminal:
+
 	     A full test:
-		python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4 -o Test_Output/
+		python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4 -o Output/
 
 	     Without image display:
-	 	python src/motionDetection.py Test_Footage/Male_Female_Brits.mp4 -o Test_Output/
+	 	python src/motionDetection.py Test_Footage/Male_Female_Brits.mp4 -o Output/
 
 	     With image display but without output:
 	 	python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4
