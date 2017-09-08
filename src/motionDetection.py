@@ -19,15 +19,15 @@ import sys
 #
 FPS_VAL = 30.0				# must match camera, must be hard-coded
 
-START_BUFFER_CAP = 30		# buffer to avoid false positive blips (in frames)
-END_BUFFER_CAP = 30			# buffer to avoid false gaps during motion (in frames)
+START_BUFFER_CAP = 10		# buffer to avoid false positive blips (in frames)
+END_BUFFER_CAP = 10			# buffer to avoid false gaps during motion (in frames)
 
-RESIZE_FACTOR = 0.5			# smaller videos are faster but may lose small motion
+RESIZE_FACTOR = 0.25		# smaller videos are faster but may lose small motion
 
-GAUSSIAN_BOX = 51			# blurring factor (larger is blurrier, must be odd)
+GAUSSIAN_BOX = 71			# blurring factor (larger is blurrier, must be odd)
 
 DIFF_THRESHOLD = 50
-SUM_THRESHOLD = 5020		# how many motion pixels for a reading? (*255)
+SUM_THRESHOLD = 8000		# how many motion pixels for a reading? (*255)
 
 #
 # off to the races
@@ -35,6 +35,7 @@ SUM_THRESHOLD = 5020		# how many motion pixels for a reading? (*255)
 t0 = time.time()
 
 firstFrame = None
+firstFrameSet = False
 motionPeriod = False
 
 frameCount = 0
@@ -53,10 +54,12 @@ hasOutput = False
 parser = argparse.ArgumentParser(description="GWMA Motion Detection")
 parser.add_argument("inFile", type=str,
 					help="file path for input video")
-parser.add_argument("-o", "--outDirectory", type=str, default="none/",
+parser.add_argument("-o", "--outDirectory", type=str, default="none",
 					help="folder for output motion clips")
 parser.add_argument("-w", "--watch", help="watch threshold images",
 					action="store_true")
+parser.add_argument("-f", "--firstFrameSec", type=int, help="select first frame (s)",
+					default=1)
 
 ARGS = parser.parse_args()
 
@@ -75,21 +78,26 @@ if os.path.exists(ARGS.outDirectory):
 else:
 	print("Proceeding with no output ([-o] not supplied or does not exist).")
 
+if (not isinstance(ARGS.firstFrameSec, int)):
+	print("First frame selection is not an integer. Exiting")
+	sys.exit()
+else:
+	firstFrameSec = ARGS.firstFrameSec
+
 watch = ARGS.watch
 
 #
 # begin streaming video from file on separate thread
 #
-fvs = FileVideoStream(inFile).start()
+fvs = cv2.VideoCapture(inFile)
 
-while not fvs.isDone():
-	#
-	# baby lock for multi-threading
-	#
-	if not fvs.more():
-		continue
+while True:
+	(grabbed, orgFrame) = fvs.read()
 
-	orgFrame = fvs.read()
+	if (not grabbed):
+		fvs.stop()
+		break
+
 	frameCount = frameCount + 1
 
 	#
@@ -99,82 +107,82 @@ while not fvs.isDone():
 	frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	frame = cv2.GaussianBlur(frame, (GAUSSIAN_BOX, GAUSSIAN_BOX), 0)
 
-	#
-	# first frame is background for all pixel diff comparisons
-	#
-	if firstFrame is None:
+	if (not firstFrameSet and (frameCount / FPS_VAL == firstFrameSec)):
 		firstFrame = frame
+		firstFrameSet = True
 		continue
-
-	#
-	# threshold pixel diffs and sum to detect binary yes/no movement
-	#
-	frameDiff = cv2.absdiff(firstFrame, frame)
-	thresh = cv2.threshold(frameDiff, DIFF_THRESHOLD, 255, cv2.THRESH_BINARY)[1]
-	thresh = cv2.dilate(thresh, None, iterations=2)
-
-	pixelSum = cv2.sumElems(thresh)
-
-	# is there sufficient movement?
-	if pixelSum[0] > SUM_THRESHOLD:
-		startBuffer = startBuffer + 1
-		endBuffer = 0
-
-		# once movement has been occuring for awhile, begin the motion reading
-		if startBuffer == START_BUFFER_CAP and not motionPeriod:
-			motionPeriod = True
-
-			# back-adjust to not lose entry
-			motionTimes.append((frameCount - START_BUFFER_CAP) / FPS_VAL)
-		
-		# store motion period frames for output clips
-		if hasOutput:
-			saveFrames.append(orgFrame)
-
-	# is the movement over (for now)?
-	else:
-		startBuffer = 0
-		
-		# count buffer to avoid false endings
-		if motionPeriod:
-			endBuffer = endBuffer + 1
-
-    # is the movement over for good? if so end motion period
-	if endBuffer == END_BUFFER_CAP:
-		endTimes.append(frameCount / FPS_VAL)
-		endBuffer = 0
-		motionPeriod = False
-
+	
+	if (firstFrameSet):
 		#
-		# all output writing happens at once using stored frames list
+		# threshold pixel diffs and sum to detect binary yes/no movement
 		#
-		if hasOutput:
-			startTime = round(motionTimes[-1],2)
-			endTime = round(endTimes[-1],2)
-			outPath = outDirectory + os.path.split(inFile)[1][0:-4] + "_" + str(int(startTime)) + "_" + str(int(endTime)) + ".avi"
+		frameDiff = cv2.absdiff(firstFrame, frame)
+		thresh = cv2.threshold(frameDiff, DIFF_THRESHOLD, 255, cv2.THRESH_BINARY)[1]
+		thresh = cv2.dilate(thresh, None, iterations=2)
 
-			# only AVI output codec is working, may be machine/ffmpeg sensitive
-			out = cv2.VideoWriter(outPath, cv2.cv.CV_FOURCC(*"XVID"), int(FPS_VAL), 
-								  (fvs.getWidth(), fvs.getHeight()))
-			print("Saving clip:" + outPath)
+		pixelSum = cv2.sumElems(thresh)
 
-			# write the frames to file
-			for f in saveFrames:
-				out.write(f)	
+		# is there sufficient movement?
+		if pixelSum[0] > SUM_THRESHOLD:
+			startBuffer = startBuffer + 1
+			endBuffer = 0
 
-			# reset motion period frames and release file
-			saveFrames = []
-			out.release()
+			# once movement has been occuring for awhile, begin the motion reading
+			if startBuffer == START_BUFFER_CAP and not motionPeriod:
+				motionPeriod = True
 
-	# progress update
-	if frameCount % 100 == 0:
-		print("Working on frame " + str(frameCount))
+				# back-adjust to not lose entry
+				motionTimes.append((frameCount - START_BUFFER_CAP) / FPS_VAL)
+			
+			# store motion period frames for output clips
+			if hasOutput:
+				saveFrames.append(orgFrame)
 
-	# neat-o display, q to quit program
-	if watch:
-		cv2.imshow("frame", thresh)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			break
+		# is the movement over (for now)?
+		else:
+			startBuffer = 0
+			
+			# count buffer to avoid false endings
+			if motionPeriod:
+				endBuffer = endBuffer + 1
+
+	    # is the movement over for good? if so end motion period
+		if endBuffer == END_BUFFER_CAP:
+			endTimes.append(frameCount / FPS_VAL)
+			endBuffer = 0
+			motionPeriod = False
+
+			#
+			# all output writing happens at once using stored frames list
+			#
+			if hasOutput:
+				startTime = round(motionTimes[-1],2)
+				endTime = round(endTimes[-1],2)
+				outPath = outDirectory + os.path.split(inFile)[1][0:-4] + "_" + str(int(startTime)) + "_" + str(int(endTime)) + ".avi"
+
+				# only AVI output codec is working, may be machine/ffmpeg sensitive
+				out = cv2.VideoWriter(outPath, cv2.cv.CV_FOURCC(*"XVID"), int(FPS_VAL), 
+									  (int(fvs.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)),
+									  int(fvs.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))))
+				print("Saving clip:" + outPath)
+
+				# write the frames to file
+				for f in saveFrames:
+					out.write(f)	
+
+				# reset motion period frames and release file
+				saveFrames = []
+				out.release()
+
+		# progress update
+		if frameCount % 100 == 0:
+			print("Working on frame " + str(frameCount))
+
+		# neat-o display, q to quit program
+		if watch:
+			cv2.imshow("frame", thresh)
+			if cv2.waitKey(1) & 0xFF == ord('q'):
+				break
 
 if watch:
 	cv2.destroyAllWindows()
