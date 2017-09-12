@@ -8,6 +8,7 @@
 # ----------------------------------
 from threading import Thread
 import Queue
+import time
 import sys
 import cv2
 
@@ -15,8 +16,8 @@ class FileVideoStream:
 	def __init__(self, filePath):
 		self.stream = cv2.VideoCapture(filePath)
 
-		self.width = int(self.stream.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-		self.height = int(self.stream.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+		self.width = int(self.stream.get(3))
+		self.height = int(self.stream.get(4))
 
 		self.stopped = False
 		self.locked = False
@@ -29,16 +30,16 @@ class FileVideoStream:
 		return self
 
 	def update(self):
-		while True:
-			if self.stopped:
-				return
+			while True:
+				if self.stopped:
+					return
 
-			(grabbed, frame) = self.stream.read()
-			if not grabbed:
-				self.stop()
-				return
+				(grabbed, frame) = self.stream.read()
+				if not grabbed:
+					self.stop()
+					return
 
-			self.Q.put(frame)
+				self.Q.put(frame)
 
 	def read(self):
 		return self.Q.get()
@@ -57,3 +58,6 @@ class FileVideoStream:
 
 	def getHeight(self):
 		return self.height
+
+	def taskDone(self):
+		self.Q.task_done()

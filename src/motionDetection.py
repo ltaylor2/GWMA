@@ -13,6 +13,7 @@ import time
 import argparse
 import os
 import sys
+import gc
 
 #
 # VISION PARAMETERS
@@ -22,7 +23,7 @@ FPS_VAL = 30.0				# must match camera, must be hard-coded
 START_BUFFER_CAP = 10		# buffer to avoid false positive blips (in frames)
 END_BUFFER_CAP = 10			# buffer to avoid false gaps during motion (in frames)
 
-RESIZE_FACTOR = 0.25		# smaller videos are faster but may lose small motion
+RESIZE_FACTOR = 0.1 		# smaller videos are faster but may lose small motion
 
 GAUSSIAN_BOX = 71			# blurring factor (larger is blurrier, must be odd)
 
@@ -91,11 +92,16 @@ watch = ARGS.watch
 #
 fvs = cv2.VideoCapture(inFile)
 
-while True:
+if (hasOutput):
+	out = cv2.VideoWriter("", cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL), 
+				  		 (int(fvs.get(3)),
+				  		  int(fvs.get(4))))
+
+while (fvs.isOpened()):
+
 	(grabbed, orgFrame) = fvs.read()
 
 	if (not grabbed):
-		fvs.stop()
 		break
 
 	frameCount = frameCount + 1
@@ -160,10 +166,11 @@ while True:
 				endTime = round(endTimes[-1],2)
 				outPath = outDirectory + os.path.split(inFile)[1][0:-4] + "_" + str(int(startTime)) + "_" + str(int(endTime)) + ".avi"
 
+				out.open(outPath, cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL), 
+				  		 (int(fvs.get(3)),
+				  		  int(fvs.get(4))))
+
 				# only AVI output codec is working, may be machine/ffmpeg sensitive
-				out = cv2.VideoWriter(outPath, cv2.cv.CV_FOURCC(*"XVID"), int(FPS_VAL), 
-									  (int(fvs.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)),
-									  int(fvs.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))))
 				print("Saving clip:" + outPath)
 
 				# write the frames to file
@@ -172,7 +179,6 @@ while True:
 
 				# reset motion period frames and release file
 				saveFrames = []
-				out.release()
 
 		# progress update
 		if frameCount % 100 == 0:
