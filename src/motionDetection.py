@@ -28,7 +28,7 @@ RESIZE_FACTOR = 0.25 		# smaller videos are faster but may lose small motion
 GAUSSIAN_BOX = 31			# blurring factor (larger is blurrier, must be odd)
 
 DIFF_THRESHOLD = 30
-SUM_THRESHOLD = 100000		# how many motion pixels for a reading? (*255)
+SUM_THRESHOLD = 80000		# how many motion pixels for a reading? (*255)
 
 def convertFrame(orgFrame):
 	resize = cv2.resize(orgFrame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
@@ -57,7 +57,7 @@ def hmsString(secValue):
 	mins = math.floor(secs / 60)
 	secs = secs - (60 * mins)
 
-	s = str(hrs) + ":" + str(mins) + ":" + str(round(secs,2))
+	s = str(int(hrs)) + ":" + str(int(mins)) + ":" + str(round(secs,2))
 	return s
 
 def clipDisplay(clipList, clipStartTimes):
@@ -65,7 +65,7 @@ def clipDisplay(clipList, clipStartTimes):
 		while True:
 			isReady = raw_input("Starting to display clips! Ready? [y]")
 			if isReady == "y":
-				print "Instructions: 'y' =  Retain // 'clear' = Remove, other = Replay"
+				print "Instructions: 'y' =  Retain // 'clear' = Remove // otherwise replay"
 				break
 
 		clipCounter = 0
@@ -170,18 +170,6 @@ if os.path.isfile(ARGS.inFile):
 else:
 	print("Input file does not exist. Exiting")
 	sys.exit()
-
-if os.path.exists(ARGS.outDirectory):
-	hasOutput = True
-	outDirectory = ARGS.outDirectory
-else:
-	print("Proceeding with no output ([-o] not supplied or does not exist).")
-
-if (not isinstance(ARGS.firstFrameSec, int)):
-	print("First frame selection is not an integer. Exiting")
-	sys.exit()
-else:
-	firstFrameSec = ARGS.firstFrameSec
 
 watch = ARGS.watch
 
