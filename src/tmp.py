@@ -21,8 +21,6 @@ FPS_VAL = 30.0				# must match camera, must be hard-coded
 START_BUFFER_CAP = 0	
 END_BUFFER_CAP = 10 * FPS_VAL
 
-MOVE_CHECK_TIMING = 60 * FPS_VAL
-
 RESIZE_FACTOR = 0.25 		# smaller videos are faster but may lose small motion
 
 GAUSSIAN_BOX = 31			# blurring factor (larger is blurrier, must be odd)
@@ -171,18 +169,19 @@ if len(clipList) > 0:
 		if isReady == "y":
 			break
 
-	clipCounter = 1
+	clipCounter = 0
 
 	for clip in clipList:
 
-		print "Displaying clip " + str(clipCounter) + "."
+		print "Displaying clip " + str(clipCounter+1) + "."
 		print "Clip start time: " + str(clipStartTimes[clipCounter])
 
 		clipCounter = clipCounter + 1
 
 		while True:
 			for frame in clip:
-				cv2.imshow("preview", frame)
+				resize = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+				cv2.imshow("preview", resize)
 				if cv2.waitKey(1) & 0xFF == ord('q'):
 					break
 
@@ -213,6 +212,6 @@ print("   Final Movement Clip Times: " +
 if len(clipStartTimes) == 0:
 	print("NO MOTION DETECTED\n")
 else:
-	for time in clipStartTime:
+	for time in clipStartTimes:
 		print "    " + str(round(time, 2))
 
