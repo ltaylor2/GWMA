@@ -33,7 +33,7 @@ Running the program:
 	Other versions may interfere with video I/O due to Codec problems.
 	OpenCV is terrible with version differences, so watch out.
 	
-	1. In OSX or Ubuntu with OpenCV and Python2 installed, open a terminal window.
+	1. On a computer with OpenCV and Python2 installed, open a terminal window.
 	2. Navigate (cd) to the directory that contains the src/ folder.
 	3. Compile and run the program with the commands:
 		python src/motionDetection.py [-h][-w] inFile
@@ -44,7 +44,14 @@ Running the program:
 		[-h] is optional, and displays parameter help without running the program.
 
 	EXAMPLES:
-	     A full test:
+	   UNIX (e.g., OSX or Ubuntu) Example:
 		python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4
+
+	   Windows Example:
+		C:\Python2.7\python.exe C:\Users\Username\GWMA\src\motionDetection.py -w C:\Users\Username\GWMA\Test_Footage\Male_Female_Brits.mp4
+
+	
+
+
 
 		
