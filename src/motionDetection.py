@@ -10,6 +10,7 @@
 from FileVideoStream import FileVideoStream
 import cv2
 import time
+import math
 import argparse
 import os
 import sys
@@ -20,24 +21,121 @@ import gc
 #
 FPS_VAL = 30.0				# must match camera, must be hard-coded
 
-START_BUFFER_CAP = 10		# buffer to avoid false positive blips (in frames)
-END_BUFFER_CAP = 10			# buffer to avoid false gaps during motion (in frames)
+END_BUFFER_CAP = 10 * FPS_VAL
 
-RESIZE_FACTOR = 0.1 		# smaller videos are faster but may lose small motion
+RESIZE_FACTOR = 0.25 		# smaller videos are faster but may lose small motion
 
-GAUSSIAN_BOX = 71			# blurring factor (larger is blurrier, must be odd)
+GAUSSIAN_BOX = 31			# blurring factor (larger is blurrier, must be odd)
 
-DIFF_THRESHOLD = 50
-SUM_THRESHOLD = 8000		# how many motion pixels for a reading? (*255)
+DIFF_THRESHOLD = 30
+SUM_THRESHOLD = 100000		# how many motion pixels for a reading? (*255)
+
+def convertFrame(orgFrame):
+	resize = cv2.resize(orgFrame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
+	frame = cv2.cvtColor(resize, cv2.COLOR_BGR2GRAY)
+	frame = cv2.GaussianBlur(frame, (GAUSSIAN_BOX, GAUSSIAN_BOX), 0)
+	return frame
+
+def getFrameDiffs(frame, prev_frame, prev_prev_frame):
+	d1 = cv2.absdiff(frame, prev_frame)
+	d2 = cv2.absdiff(prev_frame, prev_prev_frame)
+	diffFrame = cv2.bitwise_xor(d1, d2)
+	return diffFrame
+
+def getThreshold(frameDiff):
+	thresh = cv2.threshold(frameDiff, DIFF_THRESHOLD, 255, cv2.THRESH_BINARY)[1]
+	return thresh
+
+def getPixelSum(frame):
+	return cv2.sumElems(frame)
+
+def hmsString(secValue):
+	secs = secValue
+	hrs = math.floor(secs / 3600)
+	secs = secs - (3600 * hrs)
+
+	mins = math.floor(secs / 60)
+	secs = secs - (60 * mins)
+
+	s = str(hrs) + ":" + str(mins) + ":" + str(round(secs,2))
+	return s
+
+def clipDisplay(clipList, clipStartTimes):
+	if len(clipList) > 0:
+		while True:
+			isReady = raw_input("Starting to display clips! Ready? [y]")
+			if isReady == "y":
+				print "Instructions: 'y' =  Retain // 'clear' = Remove, other = Replay"
+				break
+
+		clipCounter = 0
+		numClipsDisplayed = 1
+
+		while clipCounter < len(clipList):
+			print "Displaying clip " + str(numClipsDisplayed) + "."
+			print "Clip start time: " + str(clipStartTimes[clipCounter])
+
+			clip = clipList[clipCounter]
+
+			while True:
+				for frame in clip:
+					resize = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+					cv2.imshow("preview", resize)
+					if cv2.waitKey(30) & 0xFF == ord('q'):
+						break
+
+				clipResponse = ""
+				if clipCounter == len(clipStartTimes):
+					clipResponse = raw_input("This is the last clip. Response? [y/clear/...]")
+				else:
+					clipResponse = raw_input("Response? [y/clear/...]")
+
+				if clipResponse == "y":
+					clipCounter = clipCounter + 1
+					numClipsDisplayed = numClipsDisplayed + 1
+					break
+				elif clipResponse == "clear":
+					clipList.pop(clipCounter)
+					removedTimeStr = clipStartTimes.pop(clipCounter)
+					numClipsDisplayed = numClipsDisplayed + 1
+					print "Removed clip at " + removedTimeStr
+					break
+				else:
+					print "Replaying clip " + str(numClipsDisplayed) + "."
+
+
+	else:
+		print "No clips to display!"
+
+	return clipList, clipStartTimes
+
+def infoPrint(clipStartTimes, t0, t1, fileName):
+	totalTime = t1-t0
+	print("\n\n")
+	print("For video file " + fileName)
+	print("Video length was about " + str(round(frameCount/FPS_VAL,2)) +
+		  " seconds")
+	print("Analysis done in " + str(round(totalTime,2)) + " seconds.")
+	print("------------------------")
+	print("   Final Movement Clip Times: " +
+		  "\n------------------------")
+
+	if len(clipStartTimes) == 0:
+		print "NO MOTION DETECTED\n"
+	else:
+		for timeStr in clipStartTimes:
+			print "    " + timeStr
+
 
 #
 # off to the races
 #
 t0 = time.time()
 
-firstFrame = None
-firstFrameSet = False
 motionPeriod = False
+
+prev_frame = None
+prev_prev_frame = None
 
 frameCount = 0
 startBuffer = 0
@@ -45,9 +143,13 @@ endBuffer = 0
 
 motionTimes = []
 endTimes = []
-saveFrames = []
 
 hasOutput = False
+
+clipStartTimes = []
+
+clipList = []
+clip = []
 
 #
 # Read in arguments and helpful help messages
@@ -55,12 +157,8 @@ hasOutput = False
 parser = argparse.ArgumentParser(description="GWMA Motion Detection")
 parser.add_argument("inFile", type=str,
 					help="file path for input video")
-parser.add_argument("-o", "--outDirectory", type=str, default="none",
-					help="folder for output motion clips")
 parser.add_argument("-w", "--watch", help="watch threshold images",
 					action="store_true")
-parser.add_argument("-f", "--firstFrameSec", type=int, help="select first frame (s)",
-					default=1)
 
 ARGS = parser.parse_args()
 
@@ -92,103 +190,66 @@ watch = ARGS.watch
 #
 fvs = cv2.VideoCapture(inFile)
 
-if (hasOutput):
-	out = cv2.VideoWriter("", cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL), 
-				  		 (int(fvs.get(3)),
-				  		  int(fvs.get(4))))
+fvs = FileVideoStream(inFile).start()
 
-while (fvs.isOpened()):
+while not fvs.isDone():
 
-	(grabbed, orgFrame) = fvs.read()
+	if not fvs.more():
+		continue
 
-	if (not grabbed):
-		break
+	orgFrame = fvs.read()
 
 	frameCount = frameCount + 1
-
-	#
-	# simplify video for motion recognition
-	#
-	frame = cv2.resize(orgFrame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
-	frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-	frame = cv2.GaussianBlur(frame, (GAUSSIAN_BOX, GAUSSIAN_BOX), 0)
-
-	if (not firstFrameSet and (frameCount / FPS_VAL == firstFrameSec)):
-		firstFrame = frame
-		firstFrameSet = True
-		continue
 	
-	if (firstFrameSet):
-		#
-		# threshold pixel diffs and sum to detect binary yes/no movement
-		#
-		frameDiff = cv2.absdiff(firstFrame, frame)
-		thresh = cv2.threshold(frameDiff, DIFF_THRESHOLD, 255, cv2.THRESH_BINARY)[1]
-		thresh = cv2.dilate(thresh, None, iterations=2)
+	frame = convertFrame(orgFrame)
 
-		pixelSum = cv2.sumElems(thresh)
+	if frameCount == 1:
+		prev_prev_frame = frame
+		continue
+	elif frameCount == 2:
+		prev_frame = frame
+		continue		
 
-		# is there sufficient movement?
-		if pixelSum[0] > SUM_THRESHOLD:
-			startBuffer = startBuffer + 1
-			endBuffer = 0
+	frameDiff = getFrameDiffs(frame, prev_frame, prev_prev_frame)
+	thresh = getThreshold(frameDiff)
+	pixelSum = getPixelSum(thresh)
 
-			# once movement has been occuring for awhile, begin the motion reading
-			if startBuffer == START_BUFFER_CAP and not motionPeriod:
-				motionPeriod = True
+	if watch:
+		cv2.imshow("Threshold Image", thresh)
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
 
-				# back-adjust to not lose entry
-				motionTimes.append((frameCount - START_BUFFER_CAP) / FPS_VAL)
-			
-			# store motion period frames for output clips
-			if hasOutput:
-				saveFrames.append(orgFrame)
+	if pixelSum[0] > SUM_THRESHOLD:
+		if not motionPeriod:
+			startTimeString = hmsString(frameCount / FPS_VAL)
+			clipStartTimes.append(startTimeString)
 
-		# is the movement over (for now)?
-		else:
-			startBuffer = 0
-			
-			# count buffer to avoid false endings
-			if motionPeriod:
-				endBuffer = endBuffer + 1
+		endBuffer = 0
+		motionPeriod = True
 
-	    # is the movement over for good? if so end motion period
-		if endBuffer == END_BUFFER_CAP:
-			endTimes.append(frameCount / FPS_VAL)
-			endBuffer = 0
-			motionPeriod = False
+	elif motionPeriod:
+		endBuffer = endBuffer + 1
 
-			#
-			# all output writing happens at once using stored frames list
-			#
-			if hasOutput:
-				startTime = round(motionTimes[-1],2)
-				endTime = round(endTimes[-1],2)
-				outPath = outDirectory + os.path.split(inFile)[1][0:-4] + "_" + str(int(startTime)) + "_" + str(int(endTime)) + ".avi"
+	if motionPeriod and (len(clip) < 2 * FPS_VAL):
+		clip.append(orgFrame)
 
-				out.open(outPath, cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL), 
-				  		 (int(fvs.get(3)),
-				  		  int(fvs.get(4))))
+	if endBuffer >= END_BUFFER_CAP:
+		endBuffer = 0
+		motionPeriod = clipList.append(clip)
+		clip = []
 
-				# only AVI output codec is working, may be machine/ffmpeg sensitive
-				print("Saving clip:" + outPath)
+	# progress update
+	if frameCount % 100 == 0:
+		print "Working on frame " + str(frameCount)
+		print "  " + str(len(clipList)) + " clips so far."
 
-				# write the frames to file
-				for f in saveFrames:
-					out.write(f)	
+	prev_prev_frame = prev_frame
+	prev_frame = frame
 
-				# reset motion period frames and release file
-				saveFrames = []
-
-		# progress update
-		if frameCount % 100 == 0:
-			print("Working on frame " + str(frameCount))
-
-		# neat-o display, q to quit program
-		if watch:
-			cv2.imshow("frame", thresh)
-			if cv2.waitKey(1) & 0xFF == ord('q'):
-				break
+# append the final clip if the video ends during motion
+if motionPeriod:
+	clipList.append(clip)
+	print "  " + str(len(clipList)) + " clips so far."
 
 if watch:
 	cv2.destroyAllWindows()
@@ -197,32 +258,7 @@ if frameCount == 0:
 	print("Error reading input! Not a video? Try again.")
 	sys.exit()
 
-#
-# output results, including detecting periods
-# but remember motion clips have already been written!
-#
-else:
-	t1 = time.time()
-	total = t1-t0
+clipList, clipStartTimes = clipDisplay(clipList, clipStartTimes)
 
-	print("\n\n")
-	print("For video file " + inFile)
-	print("Video length was about " + str(round(frameCount/FPS_VAL,2)) +
-		  " seconds")
-	print("Analysis done in " + str(round(total,2)) + " seconds.")
-
-	print("------------------------")
-	print("   Movement duration estimations: " +
-		  "\n------------------------")
-
-	if len(motionTimes) == 0:
-		print("NO MOTION DETECTED\n")
-	else:
-		for t in range(0, len(motionTimes)):
-			durationStr = "   " + str(round(motionTimes[t],2))
-			if len(endTimes) > t:
-				durationStr = durationStr + " -- " + str(round(endTimes[t],2))
-			else:
-				durationStr = durationStr + " -- " + "end"
-
-			print(durationStr + "\n")
+t1 = time.time()
+infoPrint(clipStartTimes, t0, t1, inFile)
