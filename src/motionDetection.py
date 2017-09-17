@@ -21,7 +21,7 @@ import gc
 #
 FPS_VAL = 30.0				# must match camera, must be hard-coded
 
-END_BUFFER_CAP = 10 * FPS_VAL
+END_BUFFER_CAP = 2 * FPS_VAL
 
 RESIZE_FACTOR = 0.25 		# smaller videos are faster but may lose small motion
 
