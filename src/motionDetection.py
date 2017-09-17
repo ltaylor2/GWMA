@@ -30,6 +30,8 @@ GAUSSIAN_BOX = 31			# blurring factor (larger is blurrier, must be odd)
 DIFF_THRESHOLD = 30
 SUM_THRESHOLD = 80000		# how many motion pixels for a reading? (*255)
 
+CLIP_STORAGE_FILENAME = "tmp_clip_storage.AVI"
+
 def convertFrame(orgFrame):
 	resize = cv2.resize(orgFrame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
 	frame = cv2.cvtColor(resize, cv2.COLOR_BGR2GRAY)
@@ -60,22 +62,48 @@ def hmsString(secValue):
 	s = str(int(hrs)) + ":" + str(int(mins)) + ":" + str(round(secs,2))
 	return s
 
-def clipDisplay(clipList, clipStartTimes):
-	if len(clipList) > 0:
+def readClipFromStorage(clipLength, fvs):
+	clip = []
+	for frameIndex in range(0, clipLength):
+		grabbed, frame = fvs.read()
+		if not grabbed:
+			print "UH OH! Weird error, clip lengths don't align with clip."
+			return
+
+		clip.append(frame)
+	return clip
+
+def writeClipToStorage(clip, clipStorage, clipStorageLengths):
+	for frame in clip:
+		clipStorage.write(frame)
+
+	clipStorageLengths.append(len(clip))
+	clip = []
+
+	return clip, clipStorageLengths
+
+def clipDisplay(clipStartTimes):
+	if len(clipStorageLengths) > 0:
 		while True:
 			isReady = raw_input("Starting to display clips! Ready? [y]")
 			if isReady == "y":
-				print "Instructions: 'y' =  Retain // 'clear' = Remove // otherwise replay"
+				print "Instructions: 'y' =  Retain // 'clear' = Remove // anything else = replay"
 				break
 
 		clipCounter = 0
 		numClipsDisplayed = 1
 
-		while clipCounter < len(clipList):
+		# NOTE here we're going to single thread it, for now,
+		# because imshow has its own thread as well, which bugs out
+		fvs = cv2.VideoCapture(CLIP_STORAGE_FILENAME)
+
+		while clipCounter < len(clipStartTimes):
 			print "Displaying clip " + str(numClipsDisplayed) + "."
 			print "Clip start time: " + str(clipStartTimes[clipCounter])
 
-			clip = clipList[clipCounter]
+			clipLength = clipStorageLengths[clipCounter]
+
+			clip = readClipFromStorage(clipLength, fvs)
 
 			while True:
 				for frame in clip:
@@ -95,19 +123,19 @@ def clipDisplay(clipList, clipStartTimes):
 					numClipsDisplayed = numClipsDisplayed + 1
 					break
 				elif clipResponse == "clear":
-					clipList.pop(clipCounter)
 					removedTimeStr = clipStartTimes.pop(clipCounter)
+					clipStorageLengths.pop(clipCounter)
 					numClipsDisplayed = numClipsDisplayed + 1
 					print "Removed clip at " + removedTimeStr
 					break
 				else:
 					print "Replaying clip " + str(numClipsDisplayed) + "."
 
-
 	else:
 		print "No clips to display!"
 
-	return clipList, clipStartTimes
+	return clipStartTimes
+
 
 def infoPrint(clipStartTimes, t0, t1, fileName):
 	totalTime = t1-t0
@@ -148,8 +176,11 @@ hasOutput = False
 
 clipStartTimes = []
 
-clipList = []
+clipCounter = 0
 clip = []
+clipStorageLengths = []
+
+written = False
 
 #
 # Read in arguments and helpful help messages
@@ -176,9 +207,10 @@ watch = ARGS.watch
 #
 # begin streaming video from file on separate thread
 #
-fvs = cv2.VideoCapture(inFile)
-
 fvs = FileVideoStream(inFile).start()
+
+clipStorage = cv2.VideoWriter(CLIP_STORAGE_FILENAME, cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL),
+						   	  (fvs.getWidth(), fvs.getHeight()))
 
 while not fvs.isDone():
 
@@ -223,21 +255,21 @@ while not fvs.isDone():
 
 	if endBuffer >= END_BUFFER_CAP:
 		endBuffer = 0
-		motionPeriod = clipList.append(clip)
-		clip = []
+		motionPeriod = False
+		clip, clipStorageLengths = writeClipToStorage(clip, clipStorage, clipStorageLengths)
 
 	# progress update
 	if frameCount % 100 == 0:
 		print "Working on frame " + str(frameCount)
-		print "  " + str(len(clipList)) + " clips so far."
+		print "  " + str(len(clipStartTimes)) + " clips so far."
 
 	prev_prev_frame = prev_frame
 	prev_frame = frame
 
 # append the final clip if the video ends during motion
 if motionPeriod:
-	clipList.append(clip)
-	print "  " + str(len(clipList)) + " clips so far."
+	clip, clipStorageLengths = writeClipToStorage(clip, clipStorage, clipStorageLengths)
+	print "  " + str(len(clipStartTimes)) + " clips so far."
 
 if watch:
 	cv2.destroyAllWindows()
@@ -246,7 +278,11 @@ if frameCount == 0:
 	print("Error reading input! Not a video? Try again.")
 	sys.exit()
 
-clipList, clipStartTimes = clipDisplay(clipList, clipStartTimes)
+clipStorage.release()
+
+clipStartTimes = clipDisplay(clipStartTimes)
 
 t1 = time.time()
 infoPrint(clipStartTimes, t0, t1, inFile)
+
+os.remove(CLIP_STORAGE_FILENAME)

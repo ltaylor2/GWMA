@@ -31,6 +31,9 @@ class FileVideoStream:
 
 	def update(self):
 			while True:
+				if self.locked:
+					continue
+
 				if self.stopped:
 					return
 
@@ -61,3 +64,9 @@ class FileVideoStream:
 
 	def taskDone(self):
 		self.Q.task_done()
+
+	def lock(self):
+		self.lock = True
+
+	def unlock(self):
+		self.lock = False
