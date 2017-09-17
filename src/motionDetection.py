@@ -138,12 +138,15 @@ def clipDisplay(clipStartTimes):
 
 
 def infoPrint(clipStartTimes, t0, t1, fileName):
-	totalTime = t1-t0
+	frameTime = t1-t0
+	userTime =  t2-t1
 	print("\n\n")
 	print("For video file " + fileName)
 	print("Video length was about " + str(round(frameCount/FPS_VAL,2)) +
 		  " seconds")
-	print("Analysis done in " + str(round(totalTime,2)) + " seconds.")
+	print("Frame analysis done in " + str(round(frameTime,2)) + " seconds.")
+	print("User sorting done in " + str(round(userTime,2)) + " seconds.")
+
 	print("------------------------")
 	print("   Final Movement Clip Times: " +
 		  "\n------------------------")
@@ -280,9 +283,10 @@ if frameCount == 0:
 
 clipStorage.release()
 
+t1 = time.time()
 clipStartTimes = clipDisplay(clipStartTimes)
 
-t1 = time.time()
-infoPrint(clipStartTimes, t0, t1, inFile)
+t2 = time.time()
+infoPrint(clipStartTimes, t0, t1, t2, inFile)
 
 os.remove(CLIP_STORAGE_FILENAME)
