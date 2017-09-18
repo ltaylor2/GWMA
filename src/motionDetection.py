@@ -87,7 +87,7 @@ def clipDisplay(clipStartTimes):
 		while True:
 			isReady = raw_input("Starting to display clips! Ready? [y]")
 			if isReady == "y":
-				print "Instructions: 'y' =  Retain // 'clear' = Remove // anything else = replay"
+				print "Instructions: 'y' =  Retain // 'c' = Clear // anything else = replay"
 				break
 
 		clipCounter = 0
@@ -122,7 +122,7 @@ def clipDisplay(clipStartTimes):
 					clipCounter = clipCounter + 1
 					numClipsDisplayed = numClipsDisplayed + 1
 					break
-				elif clipResponse == "clear":
+				elif clipResponse == "c":
 					removedTimeStr = clipStartTimes.pop(clipCounter)
 					clipStorageLengths.pop(clipCounter)
 					numClipsDisplayed = numClipsDisplayed + 1
