@@ -137,7 +137,7 @@ def clipDisplay(clipStartTimes):
 	return clipStartTimes
 
 
-def infoPrint(clipStartTimes, t0, t1, fileName):
+def infoPrint(clipStartTimes, t0, t1, t2, fileName):
 	frameTime = t1-t0
 	userTime =  t2-t1
 	print("\n\n")
