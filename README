@@ -17,10 +17,16 @@ Program process:
 		the program and, while annoying, should be ignored.
 	2. Resize input frames, convert to grayscale, and blur.
 	3. Determine motion via velocity across a window of three frames.
-	4. Threshold and score motion to determine motion periods. Store clips.
-	5. After a prompt, allow the user to survey motion clips, clearing those that
-		do not feature a bird. The program should contain many false positives
-		but (no guarantees) no false negatives.
+	4. Threshold and score motion to determine motion periods. Store clips in a 
+		temporary video file to be read back in the next step.
+		NOTE this file will be named "tmp_clip_storage.AVI" although this filename
+		can be changed with the CLIP_STORAGE_FILENAME constant. This file is deleted
+		at the END of the program, after information is printed, so if a run is
+		canceled early this has to be deleted manually (or else the next run will
+		append clips to the end-- TODO fix)
+	5. After a prompt, allow the user to survey motion clips, reading back from the 
+		storage file and clearing those that do not feature a bird. The program 
+		should contain many false positives but (no guarantees) no false negatives.
 	6. Output a final list of times (H:MM:SS.SS) at which motin begins.
 		NOTE Due to calculations from frames->seconds, motion occuring
 		at the end of the video may be marked up to ~10s early than the 
@@ -46,10 +52,6 @@ Running the program:
 	EXAMPLES:
 	   UNIX (e.g., OSX or Ubuntu) Example:
 		python src/motionDetection.py -w Test_Footage/Male_Female_Brits.mp4
-
-	   Windows Example:
-		C:\Python2.7\python.exe C:\Users\Username\GWMA\src\motionDetection.py -w C:\Users\Username\GWMA\Test_Footage\Male_Female_Brits.mp4
-
 	
 
 
