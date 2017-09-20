@@ -32,7 +32,7 @@ Program process:
 		at the end of the video may be marked up to ~10s early than the 
 		motion actually occurs in the video. The clips displayed within
 		the program will still be accurate.
-
+	7. OPTIONAL: append final list of times to an output file
 
 Running the program:
 	This program was built on Ubuntu 16.04 in Python 2.7.12 using OpenCV 3.3.0-dev.
@@ -47,6 +47,7 @@ Running the program:
 		[inFile] is required, and must be the file path to the input video
 
 		[-w] is optional. Show the thresholded motion images as the program runs. Fun.
+		[-o] is optional. Send it a file path to write the final output message to file.
 		[-h] is optional, and displays parameter help without running the program.
 
 	EXAMPLES:

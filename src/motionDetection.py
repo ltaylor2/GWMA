@@ -114,9 +114,9 @@ def clipDisplay(clipStartTimes):
 
 				clipResponse = ""
 				if clipCounter == len(clipStartTimes):
-					clipResponse = raw_input("This is the last clip. Response? [y/clear/...]")
+					clipResponse = raw_input("This is the last clip. Response? [y/c/...]")
 				else:
-					clipResponse = raw_input("Response? [y/clear/...]")
+					clipResponse = raw_input("Response? [y/c/...]")
 
 				if clipResponse == "y":
 					clipCounter = clipCounter + 1
@@ -137,25 +137,31 @@ def clipDisplay(clipStartTimes):
 	return clipStartTimes
 
 
-def infoPrint(clipStartTimes, t0, t1, t2, fileName):
+def infoPrint(clipStartTimes, t0, t1, t2, fileName, hasOutput, outFile):
 	frameTime = t1-t0
 	userTime =  t2-t1
-	print("\n\n")
-	print("For video file " + fileName)
-	print("Video length was about " + str(round(frameCount/FPS_VAL,2)) +
-		  " seconds")
-	print("Frame analysis done in " + str(round(frameTime,2)) + " seconds.")
-	print("User sorting done in " + str(round(userTime,2)) + " seconds.")
 
-	print("------------------------")
-	print("   Final Movement Clip Times: " +
-		  "\n------------------------")
+	messageString = "\n\n"
+	messageString += "For video file " + fileName + "\n"
+	messageString += "Video length was about " + str(round(frameCount/FPS_VAL,2)) + " seconds\n"
+	messageString += "Frame analysis done in " + str(round(frameTime,2)) + " seconds.\n"
+	messageString += "User sorting done in " + str(round(userTime,2)) + " seconds.\n"
+	messageString += "------------------------\n"
+	messageString += "   Final Movement Clip Times: " + "\n------------------------\n"
 
 	if len(clipStartTimes) == 0:
-		print "NO MOTION DETECTED\n"
+		messageString += "NO MOTION DETECTED\n"
 	else:
 		for timeStr in clipStartTimes:
-			print "    " + timeStr
+			messageString += "    " + timeStr + "\n"
+
+	print messageString
+
+	if hasOutput:
+		f = open(outFile, "a")
+		f.write(messageString)
+		f.close()
+		print "Wrote motion info to file " + outFile
 
 
 #
@@ -185,6 +191,9 @@ clipStorageLengths = []
 
 written = False
 
+outFile = ""
+hasOutput = False
+
 #
 # Read in arguments and helpful help messages
 #
@@ -193,6 +202,8 @@ parser.add_argument("inFile", type=str,
 					help="file path for input video")
 parser.add_argument("-w", "--watch", help="watch threshold images",
 					action="store_true")
+parser.add_argument("-o", "--outFile", help="file to write final output message",
+					type=str, default="none")
 
 ARGS = parser.parse_args()
 
@@ -204,6 +215,12 @@ if os.path.isfile(ARGS.inFile):
 else:
 	print("Input file does not exist. Exiting")
 	sys.exit()
+
+if ARGS.outFile != "none" and os.path.isfile(ARGS.outFile):
+	outFile = ARGS.outFile
+	hasOutput = True
+elif ARGS.outFile != "none" and not os.path.isfile(ARGS.outFile):
+	print "Outfile does not exist. Won't print final info results (copy them yourself!)"
 
 watch = ARGS.watch
 
@@ -287,6 +304,6 @@ t1 = time.time()
 clipStartTimes = clipDisplay(clipStartTimes)
 
 t2 = time.time()
-infoPrint(clipStartTimes, t0, t1, t2, inFile)
+infoPrint(clipStartTimes, t0, t1, t2, inFile, hasOutput, outFile)
 
 os.remove(CLIP_STORAGE_FILENAME)
