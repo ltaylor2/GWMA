@@ -187,6 +187,9 @@ def analyzeVideo(inFile, storageName, numCurrFile, numTotalFiles):
 	return clipStartTimes, clipStorageLengths, frameCount, analysisTime
 
 def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
+	longestYesStreak = 0
+	yesStreak = 0
+
 	if len(clipStorageLengths) > 0:
 		while True:
 			isReady = raw_input("Starting to display clips for file " + inFile + ". Ready? [y]")
@@ -225,11 +228,15 @@ def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
 				if clipResponse == "y":
 					clipCounter += 1
 					numClipsDisplayed += 1
+					yesStreak += 1
+					if yesStreak > longestYesStreak:
+						longestYesStreak = yesStreak
 					break
 				elif clipResponse == "c":
 					removedTimeStr = clipStartTimes.pop(clipCounter)
 					clipStorageLengths.pop(clipCounter)
 					numClipsDisplayed += 1
+					yesStreak = 0
 					print "Removed clip at " + removedTimeStr
 					break
 				else:
@@ -238,11 +245,11 @@ def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
 	else:
 		print "No clips to display!"
 
-	return clipStartTimes
+	return clipStartTimes, longestYesStreak
 
 def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName, 
 			  frameCount, hasOutput, outFile, numClips, numYes,
-			  observerName, date):
+			  observerName, date, yesStreak):
 
 	videoLength = round(frameCount / FPS_VAL, 2)
 
@@ -275,6 +282,7 @@ def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName,
 	f.write(date + ",")
 	f.write(str(numClips) + ",")
 	f.write(str(numYes) + ",")
+	f.write(str(yesStreak) + ",")
 	f.write(str(videoLength) + "\n")
 	f.close()
 	print "Wrote metadata info to file " + METADATA_STORAGE_FILENAME
@@ -387,7 +395,7 @@ for fileIndex in range(0, len(allStorageNames)):
 	analysisTime = allAnalysisTimes[fileIndex]
 
 	numClips = len(clipStartTimes)
-	clipStartTimes = clipDisplay(fileName, storageName, 
+	clipStartTimes, yesStreak = clipDisplay(fileName, storageName, 
 								 clipStartTimes, clipStorageLengths)
 	numYes = len(clipStartTimes)
 
@@ -396,7 +404,7 @@ for fileIndex in range(0, len(allStorageNames)):
 	print outFile
 	infoPrint(clipStartTimes, analysisTime, sortingTime,
 			  fileName, frameCount, hasOutput, outFile,
-			  numClips, numYes, observerName, date)
+			  numClips, numYes, observerName, date, yesStreak)
 
 	os.remove(storageName)
 
