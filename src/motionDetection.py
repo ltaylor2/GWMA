@@ -32,6 +32,8 @@ SUM_THRESHOLD = 80000		# how many motion pixels for a reading? (*255)
 
 CLIP_STORAGE_FILENAME = "tmp_clip_storage"
 
+ACCEPTABLE_FILETYPES = [".mp4", ".MP4", ".avi", ".AVI"]
+
 def convertFrame(orgFrame):
 	resize = cv2.resize(orgFrame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
 	frame = cv2.cvtColor(resize, cv2.COLOR_BGR2GRAY)
@@ -319,9 +321,15 @@ else:
 if not isDirectory:
 	fileNames = [inPath]
 else:
-	fileNames = os.listdir(inPath)
-	for fileIndex in range(0, len(fileNames)):
-		fileNames[fileIndex] = inPath + fileNames[fileIndex]
+	fullPathList = os.listdir(inPath)
+	for fileName in fullPathList:
+		fileType = fileName[-4:]
+		if fileType in ACCEPTABLE_FILETYPES:
+			fileNames.append(inPath + fileName)
+
+	if len(fileNames) == 0:
+		print "Directory contained no acceptable video files. Exiting"
+		sys.exit()
 
 numTotalFiles = len(fileNames)
 numCurrFile = 0
