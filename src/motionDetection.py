@@ -31,6 +31,7 @@ DIFF_THRESHOLD = 30
 SUM_THRESHOLD = 80000		# how many motion pixels for a reading? (*255)
 
 CLIP_STORAGE_FILENAME = "tmp_clip_storage"
+METADATA_STORAGE_FILENAME = "motiondetection_metadata.csv"
 
 ACCEPTABLE_FILETYPES = [".mp4", ".MP4", ".avi", ".AVI"]
 
@@ -240,11 +241,14 @@ def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
 	return clipStartTimes
 
 def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName, 
-			  frameCount, hasOutput, outFile):
+			  frameCount, hasOutput, outFile, numClips, numYes,
+			  observerName, date):
+
+	videoLength = round(frameCount / FPS_VAL, 2)
 
 	messageString = "\n\n"
 	messageString += "For video file " + fileName + "\n"
-	messageString += "Video length was about " + str(round(frameCount/FPS_VAL,2)) + " seconds\n"
+	messageString += "Video length was about " + str(videoLength) + " seconds\n"
 	messageString += "Frame analysis done in " + str(round(analysisTime)) + " seconds.\n"
 	messageString += "User sorting done in " + str(round(sortingTime)) + " seconds.\n"
 	messageString += "------------------------\n"
@@ -263,6 +267,17 @@ def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName,
 		f.write(messageString)
 		f.close()
 		print "Wrote motion info to file " + outFile
+
+	# metadata
+	f = open(METADATA_STORAGE_FILENAME, "a")
+	f.write(os.path.split(fileName)[1] + ",")
+	f.write(observerName + ",")
+	f.write(date + ",")
+	f.write(str(numClips) + ",")
+	f.write(str(numYes) + ",")
+	f.write(str(videoLength) + "\n")
+	f.close()
+	print "Wrote metadata info to file " + METADATA_STORAGE_FILENAME
 
 #
 # off to the races
@@ -334,6 +349,10 @@ else:
 numTotalFiles = len(fileNames)
 numCurrFile = 0
 
+print "\n\n Metadata. Will apply to all files"
+observerName = raw_input("Enter observer name/code:        ")
+date = raw_input("Enter video date [MM/DD/YY]:     ")
+
 for inputFile in fileNames:
 	numCurrFile += 1
 	s = inputFile.replace(".","").replace("/", "")
@@ -367,14 +386,17 @@ for fileIndex in range(0, len(allStorageNames)):
 	frameCount = allFrameCounts[fileIndex]
 	analysisTime = allAnalysisTimes[fileIndex]
 
+	numClips = len(clipStartTimes)
 	clipStartTimes = clipDisplay(fileName, storageName, 
 								 clipStartTimes, clipStorageLengths)
+	numYes = len(clipStartTimes)
 
 	t1 = time.time()
 	sortingTime = t1 - t0
 	print outFile
 	infoPrint(clipStartTimes, analysisTime, sortingTime,
-			  fileName, frameCount, hasOutput, outFile)
+			  fileName, frameCount, hasOutput, outFile,
+			  numClips, numYes, observerName, date)
 
 	os.remove(storageName)
 
