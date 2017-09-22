@@ -82,87 +82,7 @@ def writeClipToStorage(clip, clipStorage, clipStorageLengths):
 
 	return clip, clipStorageLengths
 
-def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
-	if len(clipStorageLengths) > 0:
-		while True:
-			isReady = raw_input("Starting to display clips for file " + inFile + ". Ready? [y]")
-			if isReady == "y":
-				print "Instructions: 'y' =  Retain // 'c' = Clear // anything else = replay"
-				break
-
-		clipCounter = 0
-		numClipsDisplayed = 1
-
-		# NOTE here we're going to single thread it, for now,
-		# because imshow has its own thread as well, which bugs out
-		fvs = cv2.VideoCapture(CLIP_STORAGE_FILENAME)
-
-		while clipCounter < len(clipStartTimes):
-			print "Displaying clip " + str(numClipsDisplayed) + "."
-			print "Clip start time: " + str(clipStartTimes[clipCounter])
-
-			clipLength = clipStorageLengths[clipCounter]
-
-			clip = readClipFromStorage(clipLength, fvs)
-
-			while True:
-				for frame in clip:
-					resize = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-					cv2.imshow("preview", resize)
-					if cv2.waitKey(30) & 0xFF == ord('q'):
-						break
-
-				clipResponse = ""
-				if clipCounter == len(clipStartTimes):
-					clipResponse = raw_input("This is the last clip. Response? [y/c/...]")
-				else:
-					clipResponse = raw_input("Response? [y/c/...]")
-
-				if clipResponse == "y":
-					clipCounter = clipCounter + 1
-					numClipsDisplayed = numClipsDisplayed + 1
-					break
-				elif clipResponse == "c":
-					removedTimeStr = clipStartTimes.pop(clipCounter)
-					clipStorageLengths.pop(clipCounter)
-					numClipsDisplayed = numClipsDisplayed + 1
-					print "Removed clip at " + removedTimeStr
-					break
-				else:
-					print "Replaying clip " + str(numClipsDisplayed) + "."
-
-	else:
-		print "No clips to display!"
-
-	return clipStartTimes
-
-
-def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName, hasOutput, outFile):
-
-	messageString = "\n\n"
-	messageString += "For video file " + fileName + "\n"
-	messageString += "Video length was about " + str(round(frameCount/FPS_VAL,2)) + " seconds\n"
-	messageString += "Frame analysis done in " + str(round(analysisTime)) + " seconds.\n"
-	messageString += "User sorting done in " + str(round(sortingTime)) + " seconds.\n"
-	messageString += "------------------------\n"
-	messageString += "   Final Movement Clip Times: " + "\n------------------------\n"
-
-	if len(clipStartTimes) == 0:
-		messageString += "NO MOTION DETECTED\n"
-	else:
-		for timeStr in clipStartTimes:
-			messageString += "    " + timeStr + "\n"
-
-	print messageString
-
-	if hasOutput:
-		f = open(outFile, "a")
-		f.write(messageString)
-		f.close()
-		print "Wrote motion info to file " + outFile
-
-
-def analyzeVideo(inFile, storageName):
+def analyzeVideo(inFile, storageName, numCurrFile, numTotalFiles):
 	t0 = time.time()
 
 	motionPeriod = False
@@ -187,7 +107,7 @@ def analyzeVideo(inFile, storageName):
 
 	fvs = FileVideoStream(inFile).start()
 
-	clipStorage = cv2.VideoWriter(storageName, cv2.VideoWriter_fourcc(*"MP4V"), int(FPS_VAL),
+	clipStorage = cv2.VideoWriter(storageName, cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL),
 							   	  (fvs.getWidth(), fvs.getHeight()))
 
 	while not fvs.isDone():
@@ -197,7 +117,7 @@ def analyzeVideo(inFile, storageName):
 
 		orgFrame = fvs.read()
 
-		frameCount = frameCount + 1
+		frameCount += 1
 		
 		frame = convertFrame(orgFrame)
 
@@ -226,7 +146,7 @@ def analyzeVideo(inFile, storageName):
 			motionPeriod = True
 
 		elif motionPeriod:
-			endBuffer = endBuffer + 1
+			endBuffer += 1
 
 		if motionPeriod and (len(clip) < 2 * FPS_VAL):
 			clip.append(orgFrame)
@@ -238,7 +158,8 @@ def analyzeVideo(inFile, storageName):
 
 		# progress update
 		if frameCount % 100 == 0:
-			print "Working on frame " + str(frameCount) + " in file " + inFile
+			print ("Working on frame " + str(frameCount) + " in file " + inFile +
+				   " (" + str(numCurrFile) + " of " + str(numTotalFiles) + ")")
 			print "  " + str(len(clipStartTimes)) + " clips so far."
 
 		prev_prev_frame = prev_frame
@@ -260,7 +181,86 @@ def analyzeVideo(inFile, storageName):
 
 	t1 = time.time()
 	analysisTime = t1 - t0
-	return allClipStartTimes, allClipStorageLengths, analysisTime
+	return clipStartTimes, clipStorageLengths, frameCount, analysisTime
+
+def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
+	if len(clipStorageLengths) > 0:
+		while True:
+			isReady = raw_input("Starting to display clips for file " + inFile + ". Ready? [y]")
+			if isReady == "y":
+				print "Instructions: 'y' =  Retain // 'c' = Clear // anything else = replay"
+				break
+
+		clipCounter = 0
+		numClipsDisplayed = 1
+
+		# NOTE here we're going to single thread it, for now,
+		# because imshow has its own thread as well, which bugs out
+		fvs = cv2.VideoCapture(storageName)
+
+		while clipCounter < len(clipStartTimes):
+			print "Displaying clip " + str(numClipsDisplayed) + "."
+			print "Clip start time: " + str(clipStartTimes[clipCounter])
+
+			clipLength = clipStorageLengths[clipCounter]
+
+			clip = readClipFromStorage(clipLength, fvs)
+
+			while True:
+				for frame in clip:
+					resize = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+					cv2.imshow("preview", resize)
+					if cv2.waitKey(30) & 0xFF == ord('q'):
+						break
+
+				clipResponse = ""
+				if clipCounter == len(clipStartTimes):
+					clipResponse = raw_input("This is the last clip. Response? [y/c/...]")
+				else:
+					clipResponse = raw_input("Response? [y/c/...]")
+
+				if clipResponse == "y":
+					clipCounter += 1
+					numClipsDisplayed += 1
+					break
+				elif clipResponse == "c":
+					removedTimeStr = clipStartTimes.pop(clipCounter)
+					clipStorageLengths.pop(clipCounter)
+					numClipsDisplayed += 1
+					print "Removed clip at " + removedTimeStr
+					break
+				else:
+					print "Replaying clip " + str(numClipsDisplayed) + "."
+
+	else:
+		print "No clips to display!"
+
+	return clipStartTimes
+
+def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName, 
+			  frameCount, hasOutput, outFile):
+
+	messageString = "\n\n"
+	messageString += "For video file " + fileName + "\n"
+	messageString += "Video length was about " + str(round(frameCount/FPS_VAL,2)) + " seconds\n"
+	messageString += "Frame analysis done in " + str(round(analysisTime)) + " seconds.\n"
+	messageString += "User sorting done in " + str(round(sortingTime)) + " seconds.\n"
+	messageString += "------------------------\n"
+	messageString += "   Final Movement Clip Times: " + "\n------------------------\n"
+
+	if len(clipStartTimes) == 0:
+		messageString += "NO MOTION DETECTED\n"
+	else:
+		for timeStr in clipStartTimes:
+			messageString += "    " + timeStr + "\n"
+
+	print messageString
+
+	if hasOutput:
+		f = open(outFile, "a")
+		f.write(messageString)
+		f.close()
+		print "Wrote motion info to file " + outFile
 
 #
 # off to the races
@@ -272,6 +272,7 @@ fileNames = []
 allStorageNames = []
 allClipStartTimes = []
 allClipStorageLengths = []
+allFrameCounts = []
 allAnalysisTimes = []
 
 #
@@ -289,44 +290,72 @@ parser.add_argument("-o", "--outFile", help="file to write final output message"
 
 ARGS = parser.parse_args()
 
+watch = ARGS.watch
+isDirectory = ARGS.isDirectory
+
 #
 # First, simple I/O check
 #
-if os.path.isfile(ARGS.inPath):
+if ((isDirectory and os.path.isdir(ARGS.inPath)) or
+    (not isDirectory and os.path.isfile(ARGS.inPath))):
 	inPath = ARGS.inPath
 else:
-	print("Input file does not exist. Exiting")
+	print ("Input file/directory does not exist. " +
+		   "Did you forget to specify a directory [-d]? Exiting")
 	sys.exit()
 
 if ARGS.outFile != "none" and os.path.isfile(ARGS.outFile):
 	outFile = ARGS.outFile
 	hasOutput = True
 elif ARGS.outFile != "none" and not os.path.isfile(ARGS.outFile):
-	print "Outfile does not exist. Won't print final info results (copy them yourself!)"
-
-watch = ARGS.watch
-isDirectory = ARGS.isDirectory
+	print "Outfile did not exist. Creating it now"
+	f = open(ARGS.outFile, "w")
+	f.close()
+	hasOutput = True
+else:
+	print "No outfile specified. Will not write results"
 
 if not isDirectory:
 	fileNames = [inPath]
 else:
 	fileNames = os.listdir(inPath)
+	for fileIndex in range(0, len(fileNames)):
+		fileNames[fileIndex] = inPath + fileNames[fileIndex]
+
+numTotalFiles = len(fileNames)
+numCurrFile = 0
 
 for inputFile in fileNames:
-	storageName = CLIP_STORAGE_FILENAME + "_" + inputFile[0:-4] + ".MP4"
+	numCurrFile += 1
+	s = inputFile.replace(".","").replace("/", "")
+	storageName = CLIP_STORAGE_FILENAME + "_" + s + ".avi"
+
+	if os.path.isfile(storageName):
+		print "The storage file already existed (from a previous run?)."
+		print "PLEASE NOTE: DELETING OLD VERSION of " + storageName
+		os.remove(storageName)
+
 	allStorageNames.append(storageName)
-	allClipStartTimes, allClipStorageLengths, allAnalysisTimes = analyzeVideo(inputFile, storageName)
+
+	clipStartTimes, clipStorageLengths, frameCount, analysisTime = analyzeVideo(inputFile, storageName, numCurrFile, numTotalFiles)
+
+	allClipStartTimes.append(clipStartTimes)
+	allClipStorageLengths.append(clipStorageLengths)
+	allFrameCounts.append(frameCount)
+	allAnalysisTimes.append(analysisTime)
 
 print "Done reading in all files! Beginning user sorting."
 
 for fileIndex in range(0, len(allStorageNames)):
-	print "Starting sorting on file " + str(fileIndex + 1) + " of " + str(len(allStorageNames))
+	print ("\n\n-----------------\nStarting sorting on file " +
+	       str(fileIndex + 1) + " of " + str(len(allStorageNames)))
 	t0 = time.time()
 
 	fileName = fileNames[fileIndex]
 	storageName = allStorageNames[fileIndex]
 	clipStartTimes = allClipStartTimes[fileIndex]
 	clipStorageLengths = allClipStorageLengths[fileIndex]
+	frameCount = allFrameCounts[fileIndex]
 	analysisTime = allAnalysisTimes[fileIndex]
 
 	clipStartTimes = clipDisplay(fileName, storageName, 
@@ -335,7 +364,7 @@ for fileIndex in range(0, len(allStorageNames)):
 	t1 = time.time()
 	sortingTime = t1 - t0
 	infoPrint(clipStartTimes, analysisTime, sortingTime,
-			  fileName, hasOutput, outFile)
+			  fileName, frameCount, hasOutput, outFile)
 
 	os.remove(storageName)
 
