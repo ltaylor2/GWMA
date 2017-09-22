@@ -300,8 +300,8 @@ if ((isDirectory and os.path.isdir(ARGS.inPath)) or
     (not isDirectory and os.path.isfile(ARGS.inPath))):
 	inPath = ARGS.inPath
 else:
-	print ("Input file/directory does not exist. " +
-		   "Did you forget to specify a directory [-d]? Exiting")
+	print ("\nInput file/directory does not exist. \n" +
+		   "Did you forget to specify a directory [-d]? Exiting.\n")
 	sys.exit()
 
 if ARGS.outFile != "none" and os.path.isfile(ARGS.outFile):
@@ -311,6 +311,7 @@ elif ARGS.outFile != "none" and not os.path.isfile(ARGS.outFile):
 	print "Outfile did not exist. Creating it now"
 	f = open(ARGS.outFile, "w")
 	f.close()
+	outFile = ARGS.outFile
 	hasOutput = True
 else:
 	print "No outfile specified. Will not write results"
@@ -331,8 +332,8 @@ for inputFile in fileNames:
 	storageName = CLIP_STORAGE_FILENAME + "_" + s + ".avi"
 
 	if os.path.isfile(storageName):
-		print "The storage file already existed (from a previous run?)."
-		print "PLEASE NOTE: DELETING OLD VERSION of " + storageName
+		print "\nThe storage file already existed (from a previous run?)."
+		print "PLEASE NOTE: DELETING OLD VERSION of " + storageName + "\n"
 		os.remove(storageName)
 
 	allStorageNames.append(storageName)
@@ -363,6 +364,7 @@ for fileIndex in range(0, len(allStorageNames)):
 
 	t1 = time.time()
 	sortingTime = t1 - t0
+	print outFile
 	infoPrint(clipStartTimes, analysisTime, sortingTime,
 			  fileName, frameCount, hasOutput, outFile)
 
