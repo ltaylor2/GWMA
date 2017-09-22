@@ -30,7 +30,7 @@ GAUSSIAN_BOX = 31			# blurring factor (larger is blurrier, must be odd)
 DIFF_THRESHOLD = 30
 SUM_THRESHOLD = 80000		# how many motion pixels for a reading? (*255)
 
-CLIP_STORAGE_FILENAME = "tmp_clip_storage.AVI"
+CLIP_STORAGE_FILENAME = "tmp_clip_storage"
 
 def convertFrame(orgFrame):
 	resize = cv2.resize(orgFrame, (0, 0), fx=RESIZE_FACTOR, fy=RESIZE_FACTOR)
@@ -82,10 +82,10 @@ def writeClipToStorage(clip, clipStorage, clipStorageLengths):
 
 	return clip, clipStorageLengths
 
-def clipDisplay(clipStartTimes):
+def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
 	if len(clipStorageLengths) > 0:
 		while True:
-			isReady = raw_input("Starting to display clips! Ready? [y]")
+			isReady = raw_input("Starting to display clips for file " + inFile + ". Ready? [y]")
 			if isReady == "y":
 				print "Instructions: 'y' =  Retain // 'c' = Clear // anything else = replay"
 				break
@@ -137,15 +137,13 @@ def clipDisplay(clipStartTimes):
 	return clipStartTimes
 
 
-def infoPrint(clipStartTimes, t0, t1, t2, fileName, hasOutput, outFile):
-	frameTime = t1-t0
-	userTime =  t2-t1
+def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName, hasOutput, outFile):
 
 	messageString = "\n\n"
 	messageString += "For video file " + fileName + "\n"
 	messageString += "Video length was about " + str(round(frameCount/FPS_VAL,2)) + " seconds\n"
-	messageString += "Frame analysis done in " + str(round(frameTime,2)) + " seconds.\n"
-	messageString += "User sorting done in " + str(round(userTime,2)) + " seconds.\n"
+	messageString += "Frame analysis done in " + str(round(analysisTime)) + " seconds.\n"
+	messageString += "User sorting done in " + str(round(sortingTime)) + " seconds.\n"
 	messageString += "------------------------\n"
 	messageString += "   Final Movement Clip Times: " + "\n------------------------\n"
 
@@ -164,42 +162,126 @@ def infoPrint(clipStartTimes, t0, t1, t2, fileName, hasOutput, outFile):
 		print "Wrote motion info to file " + outFile
 
 
+def analyzeVideo(inFile, storageName):
+	t0 = time.time()
+
+	motionPeriod = False
+
+	prev_frame = None
+	prev_prev_frame = None
+
+	frameCount = 0
+	startBuffer = 0
+	endBuffer = 0
+
+	motionTimes = []
+	endTimes = []
+
+	clipStartTimes = []
+
+	clipCounter = 0
+	clip = []
+	clipStorageLengths = []
+
+	written = False
+
+	fvs = FileVideoStream(inFile).start()
+
+	clipStorage = cv2.VideoWriter(storageName, cv2.VideoWriter_fourcc(*"MP4V"), int(FPS_VAL),
+							   	  (fvs.getWidth(), fvs.getHeight()))
+
+	while not fvs.isDone():
+
+		if not fvs.more():
+			continue
+
+		orgFrame = fvs.read()
+
+		frameCount = frameCount + 1
+		
+		frame = convertFrame(orgFrame)
+
+		if frameCount == 1:
+			prev_prev_frame = frame
+			continue
+		elif frameCount == 2:
+			prev_frame = frame
+			continue		
+
+		frameDiff = getFrameDiffs(frame, prev_frame, prev_prev_frame)
+		thresh = getThreshold(frameDiff)
+		pixelSum = getPixelSum(thresh)
+
+		if watch:
+			cv2.imshow("Threshold Image", thresh)
+			if cv2.waitKey(1) & 0xFF == ord('q'):
+				break
+
+		if pixelSum[0] > SUM_THRESHOLD:
+			if not motionPeriod:
+				startTimeString = hmsString(frameCount / FPS_VAL)
+				clipStartTimes.append(startTimeString)
+
+			endBuffer = 0
+			motionPeriod = True
+
+		elif motionPeriod:
+			endBuffer = endBuffer + 1
+
+		if motionPeriod and (len(clip) < 2 * FPS_VAL):
+			clip.append(orgFrame)
+
+		if endBuffer >= END_BUFFER_CAP:
+			endBuffer = 0
+			motionPeriod = False
+			clip, clipStorageLengths = writeClipToStorage(clip, clipStorage, clipStorageLengths)
+
+		# progress update
+		if frameCount % 100 == 0:
+			print "Working on frame " + str(frameCount) + " in file " + inFile
+			print "  " + str(len(clipStartTimes)) + " clips so far."
+
+		prev_prev_frame = prev_frame
+		prev_frame = frame
+
+	# append the final clip if the video ends during motion
+	if motionPeriod:
+		clip, clipStorageLengths = writeClipToStorage(clip, clipStorage, clipStorageLengths)
+		print "  " + str(len(clipStartTimes)) + " clips so far."
+
+	if watch:
+		cv2.destroyAllWindows()
+
+	if frameCount == 0:
+		print("Error reading input! Not a video? Try again.")
+		sys.exit()
+
+	clipStorage.release()
+
+	t1 = time.time()
+	analysisTime = t1 - t0
+	return allClipStartTimes, allClipStorageLengths, analysisTime
+
 #
 # off to the races
 #
-t0 = time.time()
-
-motionPeriod = False
-
-prev_frame = None
-prev_prev_frame = None
-
-frameCount = 0
-startBuffer = 0
-endBuffer = 0
-
-motionTimes = []
-endTimes = []
-
-hasOutput = False
-
-clipStartTimes = []
-
-clipCounter = 0
-clip = []
-clipStorageLengths = []
-
-written = False
-
 outFile = ""
 hasOutput = False
+
+fileNames = []
+allStorageNames = []
+allClipStartTimes = []
+allClipStorageLengths = []
+allAnalysisTimes = []
 
 #
 # Read in arguments and helpful help messages
 #
 parser = argparse.ArgumentParser(description="GWMA Motion Detection")
-parser.add_argument("inFile", type=str,
-					help="file path for input video")
+parser.add_argument("inPath", type=str,
+					help="file path for input video(s)")
+parser.add_argument("-d", "--isDirectory", help="is the inPath a directory?",
+					action="store_true")
 parser.add_argument("-w", "--watch", help="watch threshold images",
 					action="store_true")
 parser.add_argument("-o", "--outFile", help="file to write final output message",
@@ -210,8 +292,8 @@ ARGS = parser.parse_args()
 #
 # First, simple I/O check
 #
-if os.path.isfile(ARGS.inFile):
-	inFile = ARGS.inFile
+if os.path.isfile(ARGS.inPath):
+	inPath = ARGS.inPath
 else:
 	print("Input file does not exist. Exiting")
 	sys.exit()
@@ -223,87 +305,44 @@ elif ARGS.outFile != "none" and not os.path.isfile(ARGS.outFile):
 	print "Outfile does not exist. Won't print final info results (copy them yourself!)"
 
 watch = ARGS.watch
+isDirectory = ARGS.isDirectory
 
-#
-# begin streaming video from file on separate thread
-#
-fvs = FileVideoStream(inFile).start()
+if not isDirectory:
+	fileNames = [inPath]
+else:
+	fileNames = os.listdir(inPath)
 
-clipStorage = cv2.VideoWriter(CLIP_STORAGE_FILENAME, cv2.VideoWriter_fourcc(*"XVID"), int(FPS_VAL),
-						   	  (fvs.getWidth(), fvs.getHeight()))
+for inputFile in fileNames:
+	storageName = CLIP_STORAGE_FILENAME + "_" + inputFile[0:-4] + ".MP4"
+	allStorageNames.append(storageName)
+	allClipStartTimes, allClipStorageLengths, allAnalysisTimes = analyzeVideo(inputFile, storageName)
 
-while not fvs.isDone():
+print "Done reading in all files! Beginning user sorting."
 
-	if not fvs.more():
-		continue
+for fileIndex in range(0, len(allStorageNames)):
+	print "Starting sorting on file " + str(fileIndex + 1) + " of " + str(len(allStorageNames))
+	t0 = time.time()
 
-	orgFrame = fvs.read()
+	fileName = fileNames[fileIndex]
+	storageName = allStorageNames[fileIndex]
+	clipStartTimes = allClipStartTimes[fileIndex]
+	clipStorageLengths = allClipStorageLengths[fileIndex]
+	analysisTime = allAnalysisTimes[fileIndex]
 
-	frameCount = frameCount + 1
-	
-	frame = convertFrame(orgFrame)
+	clipStartTimes = clipDisplay(fileName, storageName, 
+								 clipStartTimes, clipStorageLengths)
 
-	if frameCount == 1:
-		prev_prev_frame = frame
-		continue
-	elif frameCount == 2:
-		prev_frame = frame
-		continue		
+	t1 = time.time()
+	sortingTime = t1 - t0
+	infoPrint(clipStartTimes, analysisTime, sortingTime,
+			  fileName, hasOutput, outFile)
 
-	frameDiff = getFrameDiffs(frame, prev_frame, prev_prev_frame)
-	thresh = getThreshold(frameDiff)
-	pixelSum = getPixelSum(thresh)
+	os.remove(storageName)
 
-	if watch:
-		cv2.imshow("Threshold Image", thresh)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			break
+print "Done with all sorting. All storage files should be removed."
 
-	if pixelSum[0] > SUM_THRESHOLD:
-		if not motionPeriod:
-			startTimeString = hmsString(frameCount / FPS_VAL)
-			clipStartTimes.append(startTimeString)
 
-		endBuffer = 0
-		motionPeriod = True
 
-	elif motionPeriod:
-		endBuffer = endBuffer + 1
 
-	if motionPeriod and (len(clip) < 2 * FPS_VAL):
-		clip.append(orgFrame)
 
-	if endBuffer >= END_BUFFER_CAP:
-		endBuffer = 0
-		motionPeriod = False
-		clip, clipStorageLengths = writeClipToStorage(clip, clipStorage, clipStorageLengths)
 
-	# progress update
-	if frameCount % 100 == 0:
-		print "Working on frame " + str(frameCount)
-		print "  " + str(len(clipStartTimes)) + " clips so far."
-
-	prev_prev_frame = prev_frame
-	prev_frame = frame
-
-# append the final clip if the video ends during motion
-if motionPeriod:
-	clip, clipStorageLengths = writeClipToStorage(clip, clipStorage, clipStorageLengths)
-	print "  " + str(len(clipStartTimes)) + " clips so far."
-
-if watch:
-	cv2.destroyAllWindows()
-
-if frameCount == 0:
-	print("Error reading input! Not a video? Try again.")
-	sys.exit()
-
-clipStorage.release()
-
-t1 = time.time()
-clipStartTimes = clipDisplay(clipStartTimes)
-
-t2 = time.time()
-infoPrint(clipStartTimes, t0, t1, t2, inFile, hasOutput, outFile)
-
-os.remove(CLIP_STORAGE_FILENAME)
