@@ -1,0 +1,174 @@
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/CrossRiver/CRLog_09_12_17_01.MP4
+Video length was about 10738.0 seconds
+Frame analysis done in 959.0 seconds.
+User sorting done in 78.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:20:36.73
+    0:56:8.83
+    0:59:53.7
+    1:0:2.23
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/CrossRiver/CRLog_09_12_17_02.MP4
+Video length was about 10730.0 seconds
+Frame analysis done in 955.0 seconds.
+User sorting done in 5.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    2:51:47.7
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/CrossRiver/CRLog_09_12_17_03.MP4
+Video length was about 909.0 seconds
+Frame analysis done in 82.0 seconds.
+User sorting done in 9.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/False/FalseLog_09_12_17_01.MP4
+Video length was about 10754.0 seconds
+Frame analysis done in 1118.0 seconds.
+User sorting done in 948.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:17:9.6
+    1:18:34.63
+    1:18:45.6
+    1:18:50.5
+    1:18:57.57
+    1:19:5.47
+    1:19:51.53
+    1:20:18.4
+    2:2:34.53
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/False/FalseLog_09_12_17_02.MP4
+Video length was about 10730.0 seconds
+Frame analysis done in 945.0 seconds.
+User sorting done in 362.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:39:43.17
+    1:40:50.5
+    1:41:3.6
+    1:55:5.37
+    1:55:13.77
+    1:56:19.9
+    1:56:23.43
+    1:57:32.23
+    1:57:37.33
+    2:18:14.07
+    2:19:16.83
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/False/FalseLog_09_12_17_03.MP4
+Video length was about 1898.0 seconds
+Frame analysis done in 166.0 seconds.
+User sorting done in 45.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:3:48.57
+    0:17:37.8
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/First/FirstLog_09_12_17_01.MP4
+Video length was about 6915.5 seconds
+Frame analysis done in 601.0 seconds.
+User sorting done in 105.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:14:33.03
+    1:14:40.97
+    1:14:58.5
+    1:15:14.07
+    1:15:53.93
+    1:15:57.13
+    1:16:3.3
+    1:16:25.07
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/First/FirstLog_09_12_17_02.MP4
+Video length was about 8371.5 seconds
+Frame analysis done in 725.0 seconds.
+User sorting done in 108.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:24:29.83
+    0:24:41.1
+    0:24:50.1
+    0:24:54.57
+    0:25:15.3
+    0:25:21.03
+    0:25:29.13
+    0:53:14.8
+    0:53:41.0
+    0:54:17.47
+    0:54:21.43
+    0:54:28.53
+    0:54:50.6
+    0:55:28.23
+    0:56:21.8
+    0:56:48.1
+    1:25:30.37
+    1:25:44.6
+    1:25:54.73
+    1:26:1.7
+    1:26:8.1
+    1:26:13.27
+    1:26:15.43
+    1:26:24.63
+    1:26:31.67
+    1:48:54.37
+    1:49:4.3
+    1:49:14.7
+    1:49:27.67
+    1:49:38.67
+    1:49:54.4
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/Luis/LuisLog_09_12_17_01.MP4
+Video length was about 10731.0 seconds
+Frame analysis done in 932.0 seconds.
+User sorting done in 47.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:57:28.13
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/Luis/LuisLog_09_12_17_02.MP4
+Video length was about 10731.0 seconds
+Frame analysis done in 933.0 seconds.
+User sorting done in 41.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    2:9:42.0
+    2:9:46.9
+    2:9:53.3
+    2:9:56.8
+    2:10:17.57
+    2:11:16.47
+
+
+For video file /Volumes/Masius_Data_NO/Video_Fall_2017/12-Sept-2017/Luis/LuisLog_09_12_17_03.MP4
+Video length was about 201.5 seconds
+Frame analysis done in 18.0 seconds.
+User sorting done in 5.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
