@@ -65,6 +65,21 @@ def hmsString(secValue):
 	s = str(int(hrs)) + ":" + str(int(mins)) + ":" + str(round(secs,2))
 	return s
 
+def getAllFiles(headPath):
+	fullPathList = os.listdir(headPath)
+	files = []
+	for potentialFile in fullPathList:
+		fileName = headPath + potentialFile
+		if (os.path.isfile(fileName) and 
+			potentialFile[-4:] in ACCEPTABLE_FILETYPES):
+			files.append(fileName)
+
+		elif os.path.isdir(fileName+"/"):
+			recursiveFiles = getAllFiles(fileName+"/")
+			for file in recursiveFiles:
+				files.append(file)
+	return files
+
 def readClipFromStorage(clipLength, fvs):
 	clip = []
 	for frameIndex in range(0, clipLength):
@@ -344,12 +359,8 @@ else:
 if not isDirectory:
 	fileNames = [inPath]
 else:
-	fullPathList = os.listdir(inPath)
-	for fileName in fullPathList:
-		fileType = fileName[-4:]
-		if fileType in ACCEPTABLE_FILETYPES:
-			fileNames.append(inPath + fileName)
-
+	fileNames = getAllFiles(inPath)
+	print fileNames
 	if len(fileNames) == 0:
 		print "Directory contained no acceptable video files. Exiting"
 		sys.exit()
