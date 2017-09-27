@@ -299,7 +299,11 @@ def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName,
 	f.write(str(numClips) + ",")
 	f.write(str(numYes) + ",")
 	f.write(str(yesStreak) + ",")
-	f.write(str(videoLength) + "\n")
+	f.write(str(videoLength) + ",")
+
+	noteStr = raw_input("Want to add a note? (just skip if not. No commas!):\n")
+	f.write(noteStr + "\n")
+
 	f.close()
 	print "Wrote metadata info to file " + METADATA_STORAGE_FILENAME
 
