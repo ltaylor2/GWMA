@@ -207,7 +207,8 @@ def clipDisplay(inFile, storageName, clipStartTimes, clipStorageLengths):
 
 	if len(clipStorageLengths) > 0:
 		while True:
-			isReady = raw_input("Starting to display clips for file " + inFile + ". Ready? [y]")
+			isReady = raw_input("Starting to display clips for file " + inFile +
+								 " (" + str(len(clipStartTimes)) + " clips). Ready? [y]")
 			if isReady == "y":
 				print "Instructions: 'y' =  Retain // 'c' = Clear // anything else = replay"
 				break
