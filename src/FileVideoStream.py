@@ -31,7 +31,7 @@ class FileVideoStream:
 
 	def update(self):
 			while True:
-				if self.locked:
+				if self.locked or self.Q.qsize() > 1000:
 					continue
 
 				if self.stopped:
@@ -65,8 +65,5 @@ class FileVideoStream:
 	def taskDone(self):
 		self.Q.task_done()
 
-	def lock(self):
-		self.lock = True
-
-	def unlock(self):
-		self.lock = False
+	def getSize(self):
+		return self.Q.qsize()
