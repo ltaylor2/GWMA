@@ -269,7 +269,7 @@ def infoPrint(clipStartTimes, analysisTime, sortingTime, fileName,
 	videoLength = round(frameCount / FPS_VAL, 2)
 
 	messageString = "\n\n"
-	messageString += "For video file " + fileName + "\n"
+	messageString += "For video file " + os.path.split(fileName)[1] + "\n"
 	messageString += "Video length was about " + str(videoLength) + " seconds\n"
 	messageString += "Frame analysis done in " + str(round(analysisTime)) + " seconds.\n"
 	messageString += "User sorting done in " + str(round(sortingTime)) + " seconds.\n"
