@@ -1,0 +1,94 @@
+
+
+For video file /home/liam/Desktop/9-Sept-2017/First/FirstLog_09_09_17_02.MP4
+Video length was about 8250.5 seconds
+Frame analysis done in 1014.0 seconds.
+User sorting done in 1970.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:6:5.6
+    2:3:44.47
+
+
+For video file /home/liam/Desktop/9-Sept-2017/First/FirstLog_09_09_17_01.MP4
+Video length was about 10733.0 seconds
+Frame analysis done in 1182.0 seconds.
+User sorting done in 38.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:23:18.87
+    0:23:23.13
+    0:44:15.43
+    1:4:2.43
+    2:53:25.73
+    2:53:49.8
+    2:54:20.23
+    2:54:31.27
+
+
+For video file /home/liam/Desktop/9-Sept-2017/Luis/LuisLog_09_09_17_01.MP4
+Video length was about 10732.0 seconds
+Frame analysis done in 1224.0 seconds.
+User sorting done in 54.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file /home/liam/Desktop/9-Sept-2017/Luis/LuisLog_09_09_17_03.MP4
+Video length was about 10732.0 seconds
+Frame analysis done in 1301.0 seconds.
+User sorting done in 133.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:42:8.9
+    1:42:11.8
+    1:42:39.77
+    1:42:47.0
+    1:42:51.0
+    1:42:59.6
+    1:43:6.43
+    1:43:14.0
+    1:43:16.67
+    1:43:21.63
+    1:43:24.77
+    1:43:28.33
+    1:43:37.23
+    1:44:28.1
+    1:44:37.87
+    1:44:40.87
+    1:44:44.8
+    1:44:50.23
+    1:44:54.03
+    1:45:9.77
+    1:45:23.3
+    1:45:29.37
+    1:45:35.8
+    1:45:51.8
+    1:46:15.77
+    1:46:31.6
+    1:46:38.07
+
+
+For video file /home/liam/Desktop/9-Sept-2017/Luis/LuisLog_09_09_17_02.MP4
+Video length was about 5987.0 seconds
+Frame analysis done in 686.0 seconds.
+User sorting done in 31.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file /home/liam/Desktop/9-Sept-2017/Luis/LuisLog_09_09_17_04.MP4
+Video length was about 6534.5 seconds
+Frame analysis done in 748.0 seconds.
+User sorting done in 4.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED

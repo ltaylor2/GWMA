@@ -1,0 +1,191 @@
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/CrossRiver/CRLog_09_16_17_01.MP4
+Video length was about 10732.0 seconds
+Frame analysis done in 1031.0 seconds.
+User sorting done in 1434.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:25:40.3
+    0:25:47.3
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/CrossRiver/CRLog_09_16_17_02.MP4
+Video length was about 10731.0 seconds
+Frame analysis done in 1051.0 seconds.
+User sorting done in 30.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:25:38.43
+    1:25:46.73
+    1:25:58.27
+    1:26:4.4
+    2:18:8.97
+    2:18:27.17
+    2:18:34.63
+    2:18:42.27
+    2:18:53.73
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/CrossRiver/CRLog_09_16_17_03.MP4
+Video length was about 3987.0 seconds
+Frame analysis done in 387.0 seconds.
+User sorting done in 0.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/False/FalseLog_09_16_17_01.MP4
+Video length was about 10732.0 seconds
+Frame analysis done in 1012.0 seconds.
+User sorting done in 311.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:39:18.13
+    0:43:11.2
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/False/FalseLog_09_16_17_03.MP4
+Video length was about 3922.5 seconds
+Frame analysis done in 378.0 seconds.
+User sorting done in 0.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/First/FirstLog_09_16_17_01.MP4
+Video length was about 10733.0 seconds
+Frame analysis done in 1051.0 seconds.
+User sorting done in 64.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:25:38.07
+    0:25:44.57
+    0:25:55.8
+    0:27:7.07
+    1:54:25.37
+    1:54:44.6
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/First/FirstLog_09_16_17_02.MP4
+Video length was about 10731.0 seconds
+Frame analysis done in 996.0 seconds.
+User sorting done in 150.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:4:35.73
+    1:4:51.07
+    1:5:12.5
+    1:5:23.67
+    1:5:41.57
+    1:6:9.47
+    1:6:17.33
+    1:6:34.37
+    1:6:47.07
+    1:6:50.77
+    1:6:57.8
+    1:18:25.67
+    1:18:40.3
+    1:18:50.07
+    1:18:54.7
+    1:19:1.47
+    1:19:49.03
+    1:20:4.47
+    1:20:15.17
+    1:20:22.1
+    1:43:35.13
+    1:43:42.37
+    1:43:44.93
+    1:43:49.73
+    1:43:57.27
+    1:44:8.9
+    1:53:56.37
+    1:54:1.1
+    1:54:4.47
+    1:54:12.57
+    1:54:19.2
+    1:55:20.33
+    1:55:28.27
+    1:55:34.8
+    1:55:46.67
+    1:55:48.93
+    1:55:52.73
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/First/FirstLog_09_16_17_03.MP4
+Video length was about 4529.0 seconds
+Frame analysis done in 426.0 seconds.
+User sorting done in 64.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:11:51.03
+    0:12:33.53
+    0:28:1.67
+    0:28:8.4
+    0:28:14.63
+    0:28:37.03
+    0:28:39.23
+    0:29:33.3
+    0:29:37.97
+    0:29:52.67
+    0:29:56.1
+    0:30:1.93
+    0:30:8.13
+    0:30:16.13
+    0:30:29.07
+    0:30:50.5
+    0:31:2.53
+    0:31:27.9
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/Luis/LuisLog_09_16_17_01.MP4
+Video length was about 10730.0 seconds
+Frame analysis done in 1040.0 seconds.
+User sorting done in 229.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:51:16.43
+    0:53:22.77
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/Luis/LuisLog_09_16_17_02.MP4
+Video length was about 10731.0 seconds
+Frame analysis done in 1044.0 seconds.
+User sorting done in 100.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    2:4:34.0
+    2:4:41.37
+    2:58:50.7
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/Luis/LuisLog_09_16_17_03.MP4
+Video length was about 3928.0 seconds
+Frame analysis done in 386.0 seconds.
+User sorting done in 129.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:0:23.73
+
+
+For video file /Users/mcecuador/Desktop/16-Sept-2017/False/FalseLog_09_16_17_02.MP4
+Video length was about 10732.0 seconds
+Frame analysis done in 1096.0 seconds.
+User sorting done in 1234.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED

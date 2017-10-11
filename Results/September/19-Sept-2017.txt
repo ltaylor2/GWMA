@@ -1,0 +1,268 @@
+
+
+For video file FirstLog_09_19_17_02.MP4
+Video length was about 10742.0 seconds
+Frame analysis done in 1235.0 seconds.
+User sorting done in 126.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    2:8:49.67
+    2:8:58.67
+    2:9:12.2
+    2:9:24.47
+    2:9:31.03
+    2:9:45.2
+    2:45:6.37
+    2:45:13.6
+    2:45:20.3
+    2:45:28.33
+    2:45:33.47
+    2:45:40.2
+    2:45:45.0
+    2:45:51.9
+    2:46:9.9
+    2:46:16.33
+    2:46:24.87
+    2:46:33.53
+    2:46:37.73
+    2:46:43.37
+    2:46:47.43
+    2:46:54.07
+    2:47:4.3
+    2:47:18.57
+    2:47:21.2
+    2:47:34.17
+    2:47:38.87
+
+
+For video file FirstLog_09_19_17_03.MP4
+Video length was about 2629.5 seconds
+Frame analysis done in 298.0 seconds.
+User sorting done in 14.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:22:29.9
+
+
+For video file FirstLog_09_19_17_01.MP4
+Video length was about 10744.0 seconds
+Frame analysis done in 1161.0 seconds.
+User sorting done in 115.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:22:47.27
+    0:22:50.27
+    0:22:52.53
+    0:23:4.33
+    0:23:46.6
+    0:23:53.37
+    0:24:1.27
+    0:24:13.33
+    0:25:4.9
+    0:25:33.67
+    0:49:38.17
+    0:49:40.77
+    0:49:47.97
+    0:49:51.07
+    0:49:59.0
+    0:50:1.97
+    0:50:7.57
+    0:50:13.5
+    0:50:16.1
+    0:50:20.03
+    0:50:32.7
+    0:50:40.43
+    0:50:47.4
+    0:50:57.67
+    0:50:59.87
+    0:51:7.07
+    0:51:11.1
+    0:51:15.73
+    0:51:19.37
+    0:51:26.4
+    0:51:29.27
+    0:51:37.13
+    0:51:44.4
+    0:51:50.93
+    0:51:54.67
+    0:52:3.7
+    0:52:10.0
+    0:52:12.67
+    0:52:16.13
+    1:5:51.53
+    1:5:56.13
+    2:55:13.2
+
+
+For video file FalseLog_09_19_17_03.MP4
+Video length was about 2705.5 seconds
+Frame analysis done in 298.0 seconds.
+User sorting done in 18.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file FalseLog_09_19_17_02.MP4
+Video length was about 10731.0 seconds
+Frame analysis done in 1165.0 seconds.
+User sorting done in 38.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    2:47:50.63
+    2:47:55.33
+    2:48:3.1
+    2:48:9.63
+    2:48:41.43
+    2:49:1.17
+    2:49:12.9
+
+
+For video file FalseLog_09_19_17_01.MP4
+Video length was about 10759.0 seconds
+Frame analysis done in 1140.0 seconds.
+User sorting done in 84.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:56:45.53
+    1:11:21.77
+    1:11:31.9
+    1:12:17.73
+    1:16:14.0
+
+
+For video file LuisLog_09_19_17_02.MP4
+Video length was about 10730.0 seconds
+Frame analysis done in 1159.0 seconds.
+User sorting done in 32.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file LuisLog_09_19_17_01.MP4
+Video length was about 10740.0 seconds
+Frame analysis done in 1136.0 seconds.
+User sorting done in 115.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:55:3.87
+    0:55:6.13
+    0:55:15.23
+    0:55:35.2
+    0:55:46.4
+    0:55:52.07
+    0:57:2.83
+    0:57:6.87
+    0:57:10.4
+    0:57:22.23
+    0:57:29.4
+    2:23:47.27
+    2:23:53.4
+    2:23:56.23
+    2:24:2.37
+    2:24:5.8
+    2:24:9.87
+    2:24:15.7
+    2:24:21.23
+    2:24:26.93
+    2:24:31.7
+    2:24:36.9
+    2:24:45.3
+    2:24:57.93
+    2:25:3.77
+    2:25:13.0
+    2:25:19.87
+    2:25:26.67
+    2:25:34.43
+    2:25:47.3
+    2:25:52.47
+    2:25:59.53
+    2:26:2.53
+    2:26:7.93
+    2:26:15.33
+    2:26:20.17
+
+
+For video file LuisLog_09_19_17_03.MP4
+Video length was about 2929.0 seconds
+Frame analysis done in 319.0 seconds.
+User sorting done in 31.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file CRLog_09_19_17_01.MP4
+Video length was about 10735.0 seconds
+Frame analysis done in 1195.0 seconds.
+User sorting done in 10.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file CRLog_09_19_17_03.MP4
+Video length was about 1064.5 seconds
+Frame analysis done in 115.0 seconds.
+User sorting done in 6.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file CRLog_09_19_17_02.MP4
+Video length was about 10730.0 seconds
+Frame analysis done in 1191.0 seconds.
+User sorting done in 14.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:20:34.77
+    1:20:41.83
+
+
+For video file BareLog_09_19_17_01.MP4
+Video length was about 10798.0 seconds
+Frame analysis done in 1173.0 seconds.
+User sorting done in 14.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    0:6:23.53
+
+
+For video file BareLog_09_19_17_03.MP4
+Video length was about 3028.0 seconds
+Frame analysis done in 334.0 seconds.
+User sorting done in 19.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED
+
+
+For video file BareLog_09_19_17_02.MP4
+Video length was about 10738.0 seconds
+Frame analysis done in 1176.0 seconds.
+User sorting done in 108.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:57:57.83
+    1:58:0.77
+    1:58:2.93
+    1:58:5.43
+    1:58:7.67
+    1:58:12.43

@@ -1,0 +1,25 @@
+
+
+For video file /home/liam/Desktop/7-Sept-2017/First/FirstLog_09_07_17_02.MP4
+Video length was about 10580.5 seconds
+Frame analysis done in 1378.0 seconds.
+User sorting done in 110.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+    1:38:39.3
+    1:57:15.63
+    1:57:20.07
+    1:57:22.77
+    1:58:39.67
+    1:58:43.93
+
+
+For video file /home/liam/Desktop/7-Sept-2017/First/FirstLog_09_07_17_01.MP4
+Video length was about 10733.0 seconds
+Frame analysis done in 1208.0 seconds.
+User sorting done in 80.0 seconds.
+------------------------
+   Final Movement Clip Times: 
+------------------------
+NO MOTION DETECTED

@@ -56,7 +56,7 @@ if len(fileNames) == 0:
 	sys.exit()
 
 fOut = open(outFile, "w")
-fOut.write("Log,Date,Video_Num,Motion_Time\n") # header file
+fOut.write("Filename,Log,Date,Video_Num,Motion_Time\n") # header file
 
 print "Scraping files"
 
@@ -88,6 +88,10 @@ for fileName in fileNames:
 
 		if line.startswith("    "):
 			motionTime = line.strip()
-			fOut.write(log + "," + date + "," + videoNum + "," + motionTime + "\n")
+			fOut.write(currVideoFile[:-4] + "," +
+					   log + "," + 
+					   date + "," + 
+					   videoNum + "," + 
+					   motionTime + "\n")
 
 print "Done scraping files"
