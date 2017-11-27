@@ -1,19 +1,17 @@
 import time
 import sys
-
+import termios
 from pynput import keyboard
 
 # KEY CODES
-PAUSE_KEY = 'p'
-BEGIN_KEY = "b"
-EXIT_KEY = "x"
+BEGIN_KEY = keyboard.Key.alt_r
+EXIT_KEY = keyboard.Key.shift_r
 
-ALAD_KEY = 'a'
-NURRT_KEY = 'n'
-DANCE_KEY = 'd'
-PERCH_KEY = 'e'
+ALAD_KEY = keyboard.Key.cmd_l
+NURRT_KEY = keyboard.Key.ctrl_l
+PERCH_KEY = keyboard.Key.alt_l
 
-SECONDARY_ALAD_KEY = 's'
+SECONDARY_ALAD_KEY = keyboard.Key.cmd_r
 
 file_name = ""
 paused = True
@@ -45,7 +43,7 @@ def on_press(key):
 	global f
 
 	# pause or unpause for all other behaviors
-	if key == keyboard.KeyCode.from_char(BEGIN_KEY):
+	if key == BEGIN_KEY:
 		print "Beginning observations at " + time.strftime("%x %H:%M:%S")
 		
 		event = "begin"
@@ -53,18 +51,11 @@ def on_press(key):
 
 		paused = False
 
-	elif key == keyboard.KeyCode.from_char(PAUSE_KEY):
-		if paused:
-			paused = False
-			print "UNPAUSED"
-		else:
-			paused = True
-			print "PAUSED NOW (\'p\' to unpause)"
-
-
-	elif key == keyboard.KeyCode.from_char(EXIT_KEY):
+	elif key == EXIT_KEY:
 		if not paused:
 			paused = True
+			termios.tcflush(sys.stdin, termios.TCIOFLUSH)
+			
 			is_sure = raw_input("Exit key pressed. Type \'exit\' to confirm: ")
 			paused = False
 
@@ -80,27 +71,38 @@ def on_press(key):
 			else:
 				return
 
-	elif key == keyboard.KeyCode.from_char(ALAD_KEY):
+	elif key == ALAD_KEY:
 		if not paused:
 			event = "ALAD"
 			print_event(event,log)
 
-	elif key == keyboard.KeyCode.from_char(NURRT_KEY):
+	elif key == NURRT_KEY:
 		if not paused:
 			event = "nurrt"
 			print_event(event, log)
 
-	elif key == keyboard.KeyCode.from_char(PERCH_KEY):
+	elif key == PERCH_KEY:
 		if not paused:
 			event = "perch"
 			print_event(event, log)
 
-	elif key == keyboard.KeyCode.from_char(SECONDARY_ALAD_KEY):
+	elif key == SECONDARY_ALAD_KEY:
 		if not paused:
 			event = "ALAD"
 			print_event(event, secondary_log)
 
 lis = keyboard.Listener(on_press=on_press)
 lis.start()
-print "Enter \'b\' to start observation."
+
+print "-----------------------------"
+print "INSTRUCTIONS:"
+print "Begin = option(R)"
+print "Nurrt = ctrl(L)"
+print "Perch = option(L)"
+print "ALAD = cmd(L)"
+print "Secondary ALAD = cmd(R)"
+print "Exit = shift(R)"
+print "-----------------------------"
+
+print "Enter option(R) to start observation."
 lis.join()
