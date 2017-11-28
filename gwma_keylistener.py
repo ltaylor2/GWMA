@@ -13,6 +13,8 @@ PERCH_KEY = keyboard.Key.alt_l
 
 SECONDARY_ALAD_KEY = keyboard.Key.cmd_r
 
+ERROR_KEY = keyboard.caps_lock
+
 file_name = ""
 paused = True
 
@@ -28,11 +30,11 @@ def print_event(event, logName):
 	timestamp = time.strftime("%H:%M:%S")
 	date = time.strftime("%x")
 
-	printStr = ""
+	printStr = "\n"
 	printStr += date + "," 
 	printStr += timestamp + ","
 	printStr += logName + ","
-	printStr += event + "\n"
+	printStr += event + ","
 
 	global f
 	f.write(printStr)
@@ -91,6 +93,11 @@ def on_press(key):
 			event = "ALAD"
 			print_event(event, secondary_log)
 
+	elif key == ERROR_KEY:
+		if not paused:
+			f.write(",")
+			print "Marked previous line as error."
+
 lis = keyboard.Listener(on_press=on_press)
 lis.start()
 
@@ -102,6 +109,7 @@ print "Perch = option(L)"
 print "ALAD = cmd(L)"
 print "Secondary ALAD = cmd(R)"
 print "Exit = shift(R)"
+print "Error = CapsLock"
 print "-----------------------------"
 
 print "Enter option(R) to start observation."
