@@ -13,7 +13,7 @@ PERCH_KEY = keyboard.Key.alt_l
 
 SECONDARY_ALAD_KEY = keyboard.Key.cmd_r
 
-ERROR_KEY = keyboard.caps_lock
+ERROR_KEY = keyboard.Key.caps_lock
 
 file_name = ""
 paused = True
